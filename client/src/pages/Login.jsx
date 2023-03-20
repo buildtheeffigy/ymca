@@ -32,6 +32,11 @@ const Login = () => {
           }
           else if(result.data[0].password == document.getElementById('password_field').value){ // correct password
             document.cookie = "user_id=" + JSON.stringify(result.data[0]) + "; path=/;";
+            document.cookie = "new_family_name=" + result.data[0].first_name + "; path=/;";
+            if(result.data[0].family != null){
+              document.cookie = "family_id=0; path=/;";
+              
+            }
             navigate("/");
           }else{
             document.getElementById("redtext").innerHTML = "Password is incorrect!";

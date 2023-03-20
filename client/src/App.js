@@ -18,6 +18,7 @@ import Logout from "./pages/Logout";
 import Schedules from "./pages/Schedules";
 import CreateProgram from "./pages/CreateProgram";
 import UserDashboard from "./pages/UserDashboard";
+import Registrations from "./pages/Registrations";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/Schedules" element={<Schedules/>}/>
         <Route path="/CreateProgram" element={<CreateProgram/>}/>
         <Route path="/UserDashboard" element={<UserDashboard/>}/>
+        <Route path="/Registrations" element={<Registrations/>}/>
         </Routes>
       </BrowserRouter>
     </div>

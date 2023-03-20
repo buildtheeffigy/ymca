@@ -32,6 +32,7 @@ const Add = () => {
         await axios.post("http://localhost:8802/users", user);
         const result2 = await axios.post("http://localhost:8802/search", user);
         document.cookie = "user_id=" + JSON.stringify(result2.data[0]) + "; path=/;";
+        document.cookie = "new_family_name=" + result2.data[0].first_name + "; path=/;";
         //didnt exist just created
         navigate("/");
       }else{

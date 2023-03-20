@@ -2,6 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import axios from "axios";
 import {useNavigate} from "react-router-dom"
+import Cookies from 'js-cookie'
 const CreateProgram = () => {
 
     const [program, setProgram] = useState({
@@ -10,7 +11,7 @@ const CreateProgram = () => {
         current_enrollment: 0,
         base_price: 0,
         member_price: 0,
-        teacher_id: 0,
+        teacher_id: JSON.parse(Cookies.get('user_id')).id,
         name: "",
         prereq_name: ""
 
@@ -21,46 +22,76 @@ const CreateProgram = () => {
     const handleChange = (e) =>{
         setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
       }
+
     
       const handleClick = async e =>{
         e.preventDefault();
 
         try{
+            //alert(JSON.parse(Cookies.get('user_id')).id);
+
+            if(document.getElementById("name").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter program name!";
+            }else if(document.getElementById("description").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter description name!";
+            }else if(document.getElementById("max_capacity").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter maximum capacity!";
+            }
+            else if(document.getElementById("current_enrollment").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter current enrollment!";
+            }else if(document.getElementById("base_price").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter base price!";
+            }
+            else if(document.getElementById("member_price").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter member price!";
+            }else if(document.getElementById("start_time").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter start time!";
+            }
+            else if(document.getElementById("end_time").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter end time!";
+            }else if(document.getElementById("start").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter start date!";
+            }else if(document.getElementById("end").value == ""){
+              document.getElementById("redtext").innerHTML = "Must enter end date!";
+            }
             
+            else{
+              if(document.getElementById("prerequisite").checked){
+
+                const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
+              
+                if(prereq_id.data.length != 0){
+                  const result = await axios.post("http://localhost:8802/createprogram2", program); // prereq
+                  const result2 = await axios.post("http://localhost:8802/scheduletable", 
+                                        {program_id: result.data.insertId,
+                                        start_time: document.getElementById("start_time").value,
+                                        end_time: document.getElementById("end_time").value,
+                                        day_of_week: document.getElementById("week").value,
+                                        start_date: document.getElementById("start").value,
+                                        end_date: document.getElementById("end").value}); // insert into schedules
+                  navigate("/");
+                }else{
+                  alert("Prerequisite class does not exist!  (Name must match previous class name)");
+                }
+              }else{
+                const result = await axios.post("http://localhost:8802/createprogram", program);
+                const result2 = await axios.post("http://localhost:8802/scheduletable", 
+                                        {program_id: result.data.insertId,
+                                        start_time: document.getElementById("start_time").value,
+                                        end_time: document.getElementById("end_time").value,
+                                        day_of_week: document.getElementById("week").value,
+                                        start_date: document.getElementById("start").value,
+                                        end_date: document.getElementById("end").value}); // insert into schedules
+                navigate("/");
+              }
+              document.getElementById("redtext").innerHTML = "";
+              
+
+              
+            }
         }catch(err){
             console.log(err);
         }
-        /*  
-        try{
-          const result = await axios.post("http://localhost:8802/search", user);
-          if(result.data.length == 0){
-            console.log("null response");
-            await axios.post("http://localhost:8802/users", user);
-            const result2 = await axios.post("http://localhost:8802/search", user);
-            document.cookie = "user_id=" + JSON.stringify(result2.data[0]) + "; path=/;";
-            //didnt exist just created
-            navigate("/");
-          }else{
-            //already exists
-            console.log(result.data);
-            const email_field = document.getElementById("email");
-            const username_field = document.getElementById('username');
-            if(result.data[0].email == email_field.value && result.data[0].username == username_field.value){
-              document.getElementById("redtext").innerHTML = "Email and username already in use!";
-            }else if(result.data[0].email == email_field.value ){
-              document.getElementById("redtext").innerHTML = "Email already in use!";
-            }else if(result.data[0].username == username_field.value){
-              document.getElementById("redtext").innerHTML = "Username already in use!";
-            }
-        }
-          
-          
-    }catch(err){
-      console.log(err);
-    }
-        
-        
-        */
       }
 
   return (
@@ -82,19 +113,14 @@ const CreateProgram = () => {
         <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange}/>
       </div>
       <div>
-      <label for='Prereq'>Prerequisites</label>
-      <select name="Prereq" id="Prereq">
-        <option value="volvo">None</option>
-        <option value="saab">Saab</option>
-        <option value="mercedes">Mercedes</option>
-        <option value="audi">Audi</option>
-        </select>
+      <label for='Prereq'>Requires prerequisite</label>
+      <input type="checkbox" id="prerequisite" name="prerequisite" value="prerequisite"></input>
       </div>
       <div>
       <label for='start'>start date</label>
-      <input type="date" id="start" name="start_date" value="2018-07-22" min="2018-01-01" max="2018-12-31"/>
+      <input type="date" id="start" name="start_date" />
       <label for='end'>end date</label>
-      <input type="date" id="end" name="end_date" value="2018-07-22" min="2018-01-01" max="2018-12-31"/>
+      <input type="date" id="end" name="end_date"/>
       </div>
       <div>
       <label for='start_time'>start time</label>

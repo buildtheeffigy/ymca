@@ -6,7 +6,7 @@ import {useNavigate} from "react-router-dom"
 const Schedules = () => {
     const navigate = useNavigate();
 
-    async function handleClick(e){
+    async function handleClick(e, schedule_id){
         try{
             const prereqname = await axios.post("http://localhost:8802/prereq", {course_id: e});
 
@@ -31,7 +31,14 @@ const Schedules = () => {
             }
 
             //console.log({user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e});
-            const result = await axios.post("http://localhost:8802/enrollment", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e});
+            if(JSON.parse(Cookies.get('user_id')).family != 1){
+              const result = await axios.post("http://localhost:8802/enrollment", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id});
+            
+            }else{
+              const result = await axios.post("http://localhost:8802/enrollment2", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id, family_member_id: Cookies.get('family_id')});
+              //alert(Cookies.get('family_id'));
+              console.log(result);
+            }
             //console.log(e + result)
             navigate("/");
             
@@ -77,7 +84,7 @@ const Schedules = () => {
                   <td>{schedule.base_price}</td>
                   <td>{schedule.member_price}</td>
                   {
-                    document.cookie ? <td><button onClick={() => handleClick(schedule.id)}>Enroll</button></td> : <td></td>
+                    document.cookie ? <td><button onClick={() => handleClick(schedule.id, schedule.schedule_id)}>Enroll</button></td> : <td></td>
                   }
                   
               </tr>
