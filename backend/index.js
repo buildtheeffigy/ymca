@@ -39,7 +39,7 @@ app.get("/programs", (req, res)=>{
 app.get("/schedules", (req, res)=>{
     //const query = "SELECT * FROM schedule INNER JOIN programs on program_id = programs.id;";
     const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', name, day_of_week, start_time, start_date, end_time, end_date, base_price, member_price FROM schedule INNER JOIN programs on program_id = programs.id;";
-    
+
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
@@ -160,9 +160,9 @@ app.post("/scheduletable", (req, res)=>{
 
 app.get("/registrations", (req, res)=>{
     //const query = "SELECT users.id, users.first_name as username, families.id as 'family_id', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.user_id = users.id ORDER BY families.id;";
-    
+
     const query = "SELECT users.id, families.id as 'family_id', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.id = enrollment.family_member_id ORDER BY users.id;";
-    
+
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
@@ -183,7 +183,7 @@ app.post("/search", (req, res)=>{
 app.post("/upgradeToMember", (req, res)=>{
     //does this mf already exist
     const query = "UPDATE users SET membership_status = 2 WHERE id = " + req.body.upgrade_id + "";
-   
+
        db.query(query, (err, data)=>{
            if(err) return res.json(err)
            return res.json(data)
@@ -193,7 +193,7 @@ app.post("/upgradeToMember", (req, res)=>{
 app.post("/upgradeToFamily", (req, res)=>{
     //does this mf already exist
     const query = "UPDATE users SET family = 1 WHERE id = " + req.body.upgrade_id + "";
-   
+
        db.query(query, (err, data)=>{
            if(err) return res.json(err)
            return res.json(data)
@@ -203,14 +203,14 @@ app.post("/upgradeToFamily", (req, res)=>{
 app.post("/families", (req, res)=>{
     //does this mf already exist
     const query = "SELECT * FROM families WHERE user_id = " + req.body.user_id + "";
-   
+
 
        db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
          })
    })
-   
+
 
 app.post("/login", (req, res)=>{
     const query = "SELECT * FROM users WHERE email = '" + req.body.email + "'";
@@ -221,8 +221,8 @@ app.post("/login", (req, res)=>{
 })
 
 app.post("/familymember", (req, res)=>{
-    
-    
+
+
     const q = "INSERT INTO families (user_id, name) VALUES (?)";
 
     const values = [
@@ -237,8 +237,8 @@ app.post("/familymember", (req, res)=>{
 })
 
 app.post("/users", (req, res)=>{
-    
-    
+
+
     const q = "INSERT INTO users (first_name, last_name, current_enrollment, password, membership_status, private, username, family, email) VALUES (?)";
 
     const values = [

@@ -6,6 +6,10 @@ import {useNavigate} from "react-router-dom"
 const Schedules = () => {
     const navigate = useNavigate();
 
+    const updateOrder = async e =>{
+      console.log("a");
+    }
+
     async function handleClick(e, schedule_id){
         try{
             const prereqname = await axios.post("http://localhost:8802/prereq", {course_id: e});
@@ -33,7 +37,7 @@ const Schedules = () => {
             //console.log({user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e});
             if(JSON.parse(Cookies.get('user_id')).family != 1){
               const result = await axios.post("http://localhost:8802/enrollment", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id});
-            
+
             }else{
               const result = await axios.post("http://localhost:8802/enrollment2", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id, family_member_id: Cookies.get('family_id')});
               //alert(Cookies.get('family_id'));
@@ -41,13 +45,13 @@ const Schedules = () => {
             }
             //console.log(e + result)
             navigate("/");
-            
+
           }catch(err){
             console.log(err);
           }
     }
 
-    const [schedules, setSchedules] = useState([])
+    const [schedules, setSchedules, ordering] = useState([])
 
     useEffect(() => {
         const fetchAllSchedules = async ()=>{
@@ -62,6 +66,36 @@ const Schedules = () => {
       }, [])
 
       return <div class='container'>
+
+      <div>
+      <header>
+      <div class="container">
+          <div class="row">
+              <div class="col-sm">
+              <a href="/"><img src='https://capitalymca.org/wp-content/uploads/2017/08/y-trenton-site-icon.png' height='75px'></img></a>
+              </div>
+              <div class="col-sm">
+              <a href="/programs/">Programs</a>
+              </div>
+              <div class="col-sm">
+              <a href="/about/">About</a>
+              </div>
+              <div class="col-sm">
+              {
+                  document.cookie ? <a href='/'>Welcome, {Cookies.get('new_family_name')}</a> : <a href="/">Sign Up  or Log In!</a>
+              }
+              </div>
+              <div class="col-sm">
+              {
+                  document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
+              }
+              </div>
+
+      </div>
+      </div>
+      </header>
+      </div>
+
       <table class='table'>
           <thead bgcolor='#F47920'>
           <tr>
@@ -74,6 +108,10 @@ const Schedules = () => {
           <th></th>
           </tr>
           </thead>
+          <select name="week" id="week" onChange={updateOrder}>
+          <option value="name">Name</option>
+          <option value="price">Price</option>
+          </select>
           <tbody>
           {schedules.map(schedule=>(
               <tr key={schedule.id}>
@@ -86,7 +124,7 @@ const Schedules = () => {
                   {
                     document.cookie ? <td><button onClick={() => handleClick(schedule.id, schedule.schedule_id)}>Enroll</button></td> : <td></td>
                   }
-                  
+
               </tr>
           ))}
 

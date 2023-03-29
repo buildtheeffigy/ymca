@@ -49,8 +49,8 @@ const Add = () => {
         }
         //navigate("/add");
       }
-      
-      
+
+
     }catch(err){
       console.log(err);
     }

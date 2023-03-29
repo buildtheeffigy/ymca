@@ -22,8 +22,8 @@ const CreateProgram = () => {
     const handleChange = (e) =>{
         setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
       }
+      
 
-    
       const handleClick = async e =>{
         e.preventDefault();
 
@@ -54,15 +54,15 @@ const CreateProgram = () => {
             }else if(document.getElementById("end").value == ""){
               document.getElementById("redtext").innerHTML = "Must enter end date!";
             }
-            
+
             else{
               if(document.getElementById("prerequisite").checked){
 
                 const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
-              
+
                 if(prereq_id.data.length != 0){
                   const result = await axios.post("http://localhost:8802/createprogram2", program); // prereq
-                  const result2 = await axios.post("http://localhost:8802/scheduletable", 
+                  const result2 = await axios.post("http://localhost:8802/scheduletable",
                                         {program_id: result.data.insertId,
                                         start_time: document.getElementById("start_time").value,
                                         end_time: document.getElementById("end_time").value,
@@ -75,7 +75,7 @@ const CreateProgram = () => {
                 }
               }else{
                 const result = await axios.post("http://localhost:8802/createprogram", program);
-                const result2 = await axios.post("http://localhost:8802/scheduletable", 
+                const result2 = await axios.post("http://localhost:8802/scheduletable",
                                         {program_id: result.data.insertId,
                                         start_time: document.getElementById("start_time").value,
                                         end_time: document.getElementById("end_time").value,
@@ -85,9 +85,9 @@ const CreateProgram = () => {
                 navigate("/");
               }
               document.getElementById("redtext").innerHTML = "";
-              
 
-              
+
+
             }
         }catch(err){
             console.log(err);
@@ -100,21 +100,37 @@ const CreateProgram = () => {
       <div id='redtext' className='redtext'></div>
       <input type="text" id='name' placeholder='program name' name='name' onChange={handleChange}/>
       <input type="text" id='description' placeholder='description' name='description' onChange={handleChange}/>
-      <div>
-        <label for='max_capacity'>Maximum Capacity</label>
+      <div style={{width:"600px"}}>
+      <div style={{width:"50%", float:"left"}}>
+          <div>
+            <label for='max_capacity'>Maximum Capacity</label>
+          </div>
       <input type="number" id="max_capacity" name="max_capacity" min="1" max="9999" onChange={handleChange}/>
-      <label for='current_enrollment'>Current Enrollment</label>
+      </div>
+      <div style={{width:"50%", float:"right"}}>
+        <div>
+          <label for='current_enrollment'>Current Enrollment</label>
+        </div>
       <input type="number" id='current_enrollment' name='current_enrollment' min="1" max="9999"  onChange={handleChange}/>
       </div>
-      <div>
+      </div>
+    <div style={{width:"600px"}}>
+      <div style={{width:"50%", float:"left"}}>
+        <div>
         <label for='base_price'>Base Price</label>
+        </div>
         <input type="number" id='base_price' name='base_price' min="1" max="9999" onChange={handleChange}/>
-        <label for='member_price'>Member Price</label>
+        </div>
+        <div style={{width:"50%", float:"right"}}>
+          <div>
+            <label for='member_price'>Member Price</label>
+          </div>
         <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange}/>
       </div>
       <div>
       <label for='Prereq'>Requires prerequisite</label>
       <input type="checkbox" id="prerequisite" name="prerequisite" value="prerequisite"></input>
+      </div>
       </div>
       <div>
       <label for='start'>start date</label>

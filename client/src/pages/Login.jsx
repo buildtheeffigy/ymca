@@ -1,3 +1,5 @@
+//unused page
+
 import React from 'react'
 import { useState } from 'react';
 import axios from "axios";
@@ -15,13 +17,13 @@ const Login = () => {
         private: 0,
         family: null
       });
-    
+
      const navigate = useNavigate();
-    
+
       const handleChange = (e) =>{
         setUser(prev=>({...prev, [e.target.name]: e.target.value}))
       }
-    
+
       const handleClick = async e =>{
         e.preventDefault();
         try{
@@ -35,13 +37,13 @@ const Login = () => {
             document.cookie = "new_family_name=" + result.data[0].first_name + "; path=/;";
             if(result.data[0].family != null){
               document.cookie = "family_id=0; path=/;";
-              
+
             }
             navigate("/");
           }else{
             document.getElementById("redtext").innerHTML = "Password is incorrect!";
           }
-          
+
         }catch(err){
           console.log(err);
         }
