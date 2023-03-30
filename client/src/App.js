@@ -16,6 +16,7 @@ import Logout from "./pages/Logout";
 import Schedules from "./pages/Schedules";
 import CreateProgram from "./pages/CreateProgram";
 import Registrations from "./pages/Registrations";
+import DeleteAccount from "./pages/DeleteAccount";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/Logout" element={<Logout/>}/>
         <Route path="/CreateProgram" element={<CreateProgram/>}/>
         <Route path="/Registrations" element={<Registrations/>}/>
+        <Route path="/DeleteAccount" element={<DeleteAccount/>}/>
         </Routes>
       </BrowserRouter>
     </div>

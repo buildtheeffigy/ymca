@@ -1,6 +1,7 @@
 import express from "express"
 import mysql from "mysql2"
 import cors from "cors"
+import sha256 from 'crypto-js/sha256.js'
 
 const app = express()
 
@@ -39,6 +40,17 @@ app.get("/programs", (req, res)=>{
 app.get("/schedules", (req, res)=>{
     //const query = "SELECT * FROM schedule INNER JOIN programs on program_id = programs.id;";
     const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', name, day_of_week, start_time, start_date, end_time, end_date, base_price, member_price FROM schedule INNER JOIN programs on program_id = programs.id;";
+
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+app.post('/deleteaccount',(req, res)=>{
+    const query = "UPDATE users SET deleted = 1 WHERE id = '" + req.body.user_id +  "'";
+
+    //const values = [req.body.course_id];
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
@@ -213,7 +225,7 @@ app.post("/families", (req, res)=>{
 
 
 app.post("/login", (req, res)=>{
-    const query = "SELECT * FROM users WHERE email = '" + req.body.email + "'";
+    const query = "SELECT * FROM users WHERE email = '" + req.body.email + "' AND deleted IS NULL";
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
@@ -245,7 +257,7 @@ app.post("/users", (req, res)=>{
         req.body.first_name,
         req.body.last_name,
         req.body.current_enrollment,
-        req.body.password,
+        sha256(req.body.password),
         req.body.membership_status,
         req.body.private,
         req.body.username,

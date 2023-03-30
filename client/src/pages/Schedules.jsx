@@ -3,12 +3,11 @@ import { useEffect } from 'react'
 import axios from "axios"
 import Cookies from 'js-cookie'
 import {useNavigate} from "react-router-dom"
+
 const Schedules = () => {
     const navigate = useNavigate();
 
-    const updateOrder = async e =>{
-      console.log("a");
-    }
+    
 
     async function handleClick(e, schedule_id){
         try{
@@ -51,19 +50,51 @@ const Schedules = () => {
           }
     }
 
-    const [schedules, setSchedules, ordering] = useState([])
+    const [schedules, setSchedules] = useState([])
+    
 
-    useEffect(() => {
+
+      const [query, setQuery] = useState('');
+      const [state, setstate] = useState({
+        query: '',
+        list: schedules
+      });
+
+
+      const handleQuery = () =>{
+        setQuery(document.getElementById('searchname').value);
+        const results = schedules.filter(post => {
+          if(document.getElementById('searchname').value == "") return post
+          return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
+        }).filter(post => {
+          if(document.getElementById('week').value.toLowerCase() == 'day'){
+            return post
+          }
+          return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+        });
+        setstate({
+          query: document.getElementById('searchname').value,
+          list: results
+        });
+        //alert(state.query);
+      }
+      useEffect(() => {
         const fetchAllSchedules = async ()=>{
           try{
               const res = await axios.get("http://localhost:8802/schedules");
               setSchedules(res.data)
+              state.list = res.data
           }catch(err){
               console.log(err)
           }
         }
         fetchAllSchedules()
+        
       }, [])
+      
+      
+      
+      
 
       return <div class='container'>
 
@@ -108,12 +139,29 @@ const Schedules = () => {
           <th></th>
           </tr>
           </thead>
-          <select name="week" id="week" onChange={updateOrder}>
-          <option value="name">Name</option>
-          <option value="price">Price</option>
-          </select>
+          
           <tbody>
-          {schedules.map(schedule=>(
+            <tr>
+            <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
+            <td>
+            <select name="week" id="week" onChange={handleQuery}>
+              <option value="day">Choose day</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+            </td>
+            <td>f</td>
+            <td>f</td>
+            <td>d</td>
+            <td>d</td>
+            <td>d</td>
+            </tr>
+          {state.list.map(schedule=>(
               <tr key={schedule.id}>
                   <td>{schedule.name}</td>
                   <td>{schedule.day_of_week}</td>

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import sha256 from 'crypto-js/sha256.js'
+
 
 
 
@@ -25,7 +27,21 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) =>{
-  setUser(prev=>({...prev, [e.target.name]: e.target.value}))
+    //alert(e.target.name);
+    if(e.target.name == 'staff'){
+      //alert(e.target.checked);
+      if(e.target.checked){
+        setUser(prev=>({...prev, ['private']: 1}))
+      }
+      else{
+        setUser(prev=>({...prev, ['private']: 0}))
+      }
+
+
+    }else{
+      setUser(prev=>({...prev, [e.target.name]: e.target.value}))
+    }
+  
 }
 
 //!!Adds new user
@@ -70,7 +86,7 @@ const handleClickLogin = async e =>{
     if(result.data.length == 0){
       document.getElementById("redtext").innerHTML = "User does not exist!";
     }
-    else if(result.data[0].password == document.getElementById('password_field').value){ // correct password
+    else if(result.data[0].password == sha256(document.getElementById('password_field').value)){ // correct password
       document.cookie = "user_id=" + JSON.stringify(result.data[0]) + "; path=/;";
       document.cookie = "new_family_name=" + result.data[0].first_name + "; path=/;";
       if(result.data[0].family != null){
@@ -172,6 +188,11 @@ async function RegRedirect(e){
                             document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
                         }
                         </div>
+                        <div class="col-sm">
+                        {
+                            document.cookie ? <a href="/DeleteAccount/">Delete Account</a> : <div></div>
+                        }
+                        </div>
 
                 </div>
                 </div>
@@ -234,6 +255,8 @@ async function RegRedirect(e){
                           <input type="text" placeholder='first name' name='first_name'  onChange={handleChange}/>
                           <input type="text" placeholder='last name' name='last_name' onChange={handleChange}/>
                           <input type="password" placeholder='password' name='password' onChange={handleChange}/>
+                          <input type="checkbox" name="staff" id='staff' value='staff' onChange={handleChange}/>
+                          <label for="staff">Create staff account</label><br></br>
                           <button className='formButton' onClick={handleClickAdd}>Submit</button>
                         </div>
                         <div className='form' style={{width:"50%", float:"right", margin_top:"100px"}}>

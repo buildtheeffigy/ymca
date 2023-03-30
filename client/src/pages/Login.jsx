@@ -32,7 +32,7 @@ const Login = () => {
           if(result.data.length == 0){
             document.getElementById("redtext").innerHTML = "User does not exist!";
           }
-          else if(result.data[0].password == document.getElementById('password_field').value){ // correct password
+          else if(result.data[0].password == hash(document.getElementById('password_field').value)){ // correct password
             document.cookie = "user_id=" + JSON.stringify(result.data[0]) + "; path=/;";
             document.cookie = "new_family_name=" + result.data[0].first_name + "; path=/;";
             if(result.data[0].family != null){
