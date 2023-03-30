@@ -41,7 +41,7 @@ const Home = () => {
     }else{
       setUser(prev=>({...prev, [e.target.name]: e.target.value}))
     }
-  
+
 }
 
 //!!Adds new user
@@ -167,7 +167,7 @@ async function RegRedirect(e){
   return (
     <div>
         <header>
-                <div class="container">
+              <div class="container">
                     <div class="row">
                         <div class="col-sm">
                         <a href="/"><img src='https://capitalymca.org/wp-content/uploads/2017/08/y-trenton-site-icon.png' height='75px'></img></a>
@@ -194,59 +194,80 @@ async function RegRedirect(e){
                         }
                         </div>
 
-                </div>
-                </div>
-    </header>
-    <div>
-          <div>
+                    </div>
+              </div>
 
+        </header>
 
-
-
-
-
-                {
-                  document.cookie ? (JSON.parse(Cookies.get('user_id')).private == 1 ?
-                  (//Staff view
-                    <div><button class="btn btn-secondary btn-lg" onClick={() => createProgRedirect()}>Create Program!</button>
-                  <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button></div>
+              {
+                document.cookie ? (JSON.parse(Cookies.get('user_id')).private == 1 ?
+                (//Staff view
+                  <div>
+                    <button class="btn btn-secondary btn-lg" onClick={() => createProgRedirect()}>Create Program!</button>
+                    <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
+                  </div>
                 )
-                  :(//Customer view
-                    <div>    <div>
+                :(//Customer view
+                  <div>
+                    <div style={{width:"600px", marginLeft:"30%", marginRight:"auto", marginTop:"30px"}}>{/*//Family account div*/}
                       {
                         document.cookie && JSON.parse(Cookies.get('user_id')).family != null
                         ?
                         <div>
-                        <h3 class="display-4">Logged in as: {JSON.parse(Cookies.get('user_id')).first_name} {JSON.parse(Cookies.get('user_id')).last_name}</h3>
-                        <div style={{background:"green", width:"50%", float:"left"}}><h1 class="display-1">Family Members</h1></div>
-
-                        <div><input type="text" id="fname" name="fname"></input> <button class="btn btn-secondary btn-lg" id={0} onClick={() => AddMember()}>Add Family Member</button></div>
-                      <div>
-
-                          <button class="btn btn-secondary btn-lg" id={0} onClick={() => changeFamilyMember(0, JSON.parse(Cookies.get('user_id')).first_name)}>{JSON.parse(Cookies.get('user_id')).first_name}</button>
-                          {programs.map(element=>(<button class="btn btn-secondary btn-lg" id={element.id} onClick={() => changeFamilyMember(element.id, element.name)}>{element.name}</button>))}
-                          </div>
-                          </div>
-                        :
-                        <div>
-                          <button class="btn btn-secondary btn-lg" id={0} onClick={() => MakeFamily()}>Convert to family account</button>
+                            {/*family account view*/}
+                            <div style={{padding:"50px", background:"orange", width:"50%", float:"left"}}>
+                              <input type="text" id="fname" name="fname"></input>
+                              <button class="btn btn-secondary btn-lg" id={0} onClick={() => AddMember()}>Add Family Member</button>
+                            </div>
+                            <div style={{padding:"50px", background:"orange", width:"50%", float:"right"}}>
+                              <h1 class="display-1">Family Members</h1>
+                              <h3 class="display-4">Logged in as: {JSON.parse(Cookies.get('user_id')).first_name} {JSON.parse(Cookies.get('user_id')).last_name}</h3>
+                              <div>
+                                <button class="btn btn-secondary btn-lg" id={0} onClick={() => changeFamilyMember(0, JSON.parse(Cookies.get('user_id')).first_name)}>{JSON.parse(Cookies.get('user_id')).first_name}</button>
+                                {programs.map(element=>(<button class="btn btn-secondary btn-lg" id={element.id} onClick={() => changeFamilyMember(element.id, element.name)}>{element.name}</button>))}
+                              </div>
+                            </div>
                         </div>
+                        :
+                        (<div>
+                          {/*solo account view*/}
+                          <div style={{padding:"50px", background:"orange", width:"50%", float:"left"}}>
+                            <button class="btn btn-secondary btn-lg" id={0} onClick={() => MakeFamily()}>Convert to family account</button>
+                          </div>
+                          <div style={{padding:"50px", background:"orange", width:"50%", float:"right", height:"177.778px"}}>
+                            {/*this is empty intentionally. Just meant to show where memer switching will be*/}
+                          </div>
+                        </div>
+                      )
                       }
-                      <div>
+                    </div>
+                    <div style={{width:"600px", marginLeft:"30%", marginRight:"auto", marginTop:"30px"}}>{/*member account div*/}
                         {
                           document.cookie && JSON.parse(Cookies.get('user_id')).membership_status != 2
                           ?
-                          (<div><button class="btn btn-secondary btn-lg" id={0} onClick={() => UpgradeMember()}>Upgrade to a YMCA Membership!</button>
-                          <h1 class="display-1">Currently NOT YMCA Member!</h1></div>)
+                          (<div>
+                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"left"}}>
+                              <button class="btn btn-secondary btn-lg" id={0} onClick={() => UpgradeMember()}>Upgrade to a YMCA Membership!</button>
+                            </div>
+                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"right"}}>
+                              <h1 class="display-1">Currently NOT YMCA Member!</h1>
+                            </div>
+                          </div>)
                           :
-                          (<div><button class="btn btn-secondary btn-lg" id={0} onClick={() => DowngradeMember()}>End YMCA Membership!</button>
-                          <h1 class="display-1">Currently a YMCA Member!</h1></div>)
+                          (<div>
+                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"left"}}>
+                              <button class="btn btn-secondary btn-lg" id={0} onClick={() => DowngradeMember()}>End YMCA Membership!</button>
+                            </div>
+                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"right"}}>
+                              <h1 class="display-1">Currently a YMCA Member!</h1>
+                            </div>
+                          </div>)
                         }
-                      </div>
-                      </div></div>))
-                  :(<div>
-                    {/*not logged in, get this view*/}
-                    <div style={{width:"600px", marginLeft:"40%", marginRight:"auto", marginTop:"30px"}}>
+                    </div>
+                  </div>))
+                :(<div>
+                      {/*not logged in, get this view*/}
+                      <div style={{width:"600px", marginLeft:"40%", marginRight:"auto", marginTop:"30px"}}>
                         <div className='form' style={{width:"50%", float:"left"}}>
                           <h1>Sign Up!</h1>
                           <div id='redtext' className='redtext'></div>
@@ -266,12 +287,11 @@ async function RegRedirect(e){
                           <input type="password" id='password_field' placeholder='password' name='password' onChange={handleChange}/>
                           <button className='formButton' onClick={handleClickLogin}>Submit</button>
                         </div>
-                      </div></div>)
+                      </div>
+                  </div>)
+              }
 
-                }
-          </div>
 
-    </div>
     </div>
   )
 }

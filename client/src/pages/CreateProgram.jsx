@@ -22,7 +22,17 @@ const CreateProgram = () => {
     const handleChange = (e) =>{
         setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
       }
-      
+
+
+      const startDatess= async e=>{
+        var q = new Date();
+        var date = new Date(q.getFullYear(),q.getMonth(),q.getDate());
+        var mydate = new Date(document.getElementById('start').value);
+
+        if(date > mydate) {
+          alert("The selected date is in the past");
+        }
+      }
 
       const handleClick = async e =>{
         e.preventDefault();
@@ -70,7 +80,7 @@ const CreateProgram = () => {
                                         start_date: document.getElementById("start").value,
                                         end_date: document.getElementById("end").value}); // insert into schedules
                   navigate("/");
-                }else{
+                }else{{document.getElementById('start_time').valueAsDate = new Date()}
                   alert("Prerequisite class does not exist!  (Name must match previous class name)");
                 }
               }else{
@@ -134,13 +144,14 @@ const CreateProgram = () => {
       </div>
       <div>
       <label for='start'>start date</label>
-      <input type="date" id="start" name="start_date" />
+      <input type="date" id="start" name="start_date"onBlur={startDatess}/>
       <label for='end'>end date</label>
       <input type="date" id="end" name="end_date"/>
       </div>
       <div>
       <label for='start_time'>start time</label>
-      <input type="time" id="start_time" name="start_time"required/>
+      <input type="time" id="start_time" name="start_time" required/>
+
       <label for='start_time'>end time</label>
       <input type="time" id="end_time" name="end_time"required/>
       </div>

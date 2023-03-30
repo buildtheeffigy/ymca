@@ -7,7 +7,7 @@ import {useNavigate} from "react-router-dom"
 const Schedules = () => {
     const navigate = useNavigate();
 
-    
+
 
     async function handleClick(e, schedule_id){
         try{
@@ -51,7 +51,7 @@ const Schedules = () => {
     }
 
     const [schedules, setSchedules] = useState([])
-    
+
 
 
       const [query, setQuery] = useState('');
@@ -89,19 +89,19 @@ const Schedules = () => {
           }
         }
         fetchAllSchedules()
-        
+
       }, [])
-      
-      
-      
-      
+
+
+
+
 
       return <div class='container'>
 
       <div>
       <header>
-      <div class="container">
-          <div class="row">
+          <div class="container">
+            <div class="row">
               <div class="col-sm">
               <a href="/"><img src='https://capitalymca.org/wp-content/uploads/2017/08/y-trenton-site-icon.png' height='75px'></img></a>
               </div>
@@ -121,25 +121,23 @@ const Schedules = () => {
                   document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
               }
               </div>
-
-      </div>
-      </div>
+            </div>
+          </div>
       </header>
       </div>
 
       <table class='table'>
           <thead bgcolor='#F47920'>
-          <tr>
-          <th>Name</th>
-          <th>Day</th>
-          <th>Time</th>
-          <th>Start/End Date</th>
-          <th>Base Price</th>
-          <th>Member Price</th>
-          <th></th>
-          </tr>
+            <tr>
+            <th>Name</th>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Start/End Date</th>
+            <th>Price</th>
+            <th>Capacity (current/max)</th>
+            </tr>
           </thead>
-          
+
           <tbody>
             <tr>
             <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
@@ -167,8 +165,8 @@ const Schedules = () => {
                   <td>{schedule.day_of_week}</td>
                   <td>{schedule.start_time}  {schedule.end_time}</td>
                   <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
-                  <td>{schedule.base_price}</td>
-                  <td>{schedule.member_price}</td>
+                  {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
+                  <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
                   {
                     document.cookie ? <td><button onClick={() => handleClick(schedule.id, schedule.schedule_id)}>Enroll</button></td> : <td></td>
                   }
@@ -176,7 +174,7 @@ const Schedules = () => {
               </tr>
           ))}
 
-</tbody>
+          </tbody>
       </table>
     </div>
 }
