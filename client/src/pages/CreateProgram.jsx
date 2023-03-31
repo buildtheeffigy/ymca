@@ -23,49 +23,62 @@ const CreateProgram = () => {
         setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
       }
 
-
-      const startDatess= async e=>{
-        var q = new Date();
-        var date = new Date(q.getFullYear(),q.getMonth(),q.getDate());
-        var mydate = new Date(document.getElementById('start').value);
-
-        if(date > mydate) {
-          alert("The selected date is in the past");
-        }
-      }
-
       const handleClick = async e =>{
         e.preventDefault();
 
         try{
             //alert(JSON.parse(Cookies.get('user_id')).id);
-
+            const assd=document.getElementsByClassName("redtext");
+            for(let i=0; i<assd.length; i++){
+              assd[i].innerHTML = "";
+            }
+            var q = new Date();
+            var date = new Date(q.getFullYear(),q.getMonth(),q.getDate());
+            var starDate = new Date(document.getElementById('start').value);
+            var endDate = new Date(document.getElementById('end').value);
             if(document.getElementById("name").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter program name!";
-            }else if(document.getElementById("description").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter description name!";
-            }else if(document.getElementById("max_capacity").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter maximum capacity!";
+              document.getElementById("redtext1").innerHTML = "Must enter program name!";
+            } if(document.getElementById("description").value == ""){
+              document.getElementById("redtext2").innerHTML = "Must enter description name!";
+            } if(document.getElementById("max_capacity").value == ""){
+              document.getElementById("redtext3").innerHTML = "Must enter maximum capacity!";
+            }else if(document.getElementById("max_capacity").value == "0"){
+              document.getElementById("redtext3").innerHTML = "Mac capacity must be greater than zero!";
             }
-            else if(document.getElementById("current_enrollment").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter current enrollment!";
-            }else if(document.getElementById("base_price").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter base price!";
+             if(document.getElementById("current_enrollment").value == ""){
+              document.getElementById("redtext4").innerHTML = "Must enter current enrollment!";
+            } if(document.getElementById("base_price").value == ""){
+              document.getElementById("redtext5").innerHTML = "Must enter base price!";
             }
-            else if(document.getElementById("member_price").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter member price!";
-            }else if(document.getElementById("start_time").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter start time!";
+             if(document.getElementById("member_price").value == ""){
+              document.getElementById("redtext6").innerHTML = "Must enter member price!";
+            } if(document.getElementById("start_time").value == ""){
+              document.getElementById("redtext7").innerHTML = "Must enter start time!";
             }
-            else if(document.getElementById("end_time").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter end time!";
-            }else if(document.getElementById("start").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter start date!";
-            }else if(document.getElementById("end").value == ""){
-              document.getElementById("redtext").innerHTML = "Must enter end date!";
+             if(document.getElementById("end_time").value == ""){
+              document.getElementById("redtext8").innerHTML = "Must enter end time!";
+            }
+            else if(document.getElementById("end_time").value<document.getElementById("start_time").value){
+              document.getElementById("redtext8").innerHTML = "End time can't be earlier than start time!";
+            }
+            if(document.getElementById("start").value == ""){
+              document.getElementById("redtext9").innerHTML = "Must enter start date!";
+            } else if (date > starDate) {
+              document.getElementById("redtext9").innerHTML = "Start date is in the past!";
             }
 
-            else{
+            if(document.getElementById("end").value == ""){
+              document.getElementById("redtext10").innerHTML = "Must enter end date!";
+            } else if(endDate < starDate){
+              document.getElementById("redtext10").innerHTML = "End date is earlier than start date!";
+            }
+            var numInvalids=0;
+            for(let i=0; i<assd.length; i++){
+              if(assd[i].innerHTML!=""){
+                numInvalids+=1
+              }
+            }
+             if(numInvalids==0){
               if(document.getElementById("prerequisite").checked){
 
                 const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
@@ -94,7 +107,7 @@ const CreateProgram = () => {
                                         end_date: document.getElementById("end").value}); // insert into schedules
                 navigate("/");
               }
-              document.getElementById("redtext").innerHTML = "";
+              //document.getElementById("redtext").innerHTML = "";
 
 
 
@@ -107,18 +120,23 @@ const CreateProgram = () => {
   return (
     <div className='form'>
       <h1>Create Program!</h1>
-      <div id='redtext' className='redtext'></div>
+      <div id='redtext1' className='redtext'></div>
+      <label for='name'>Name</label>
       <input type="text" id='name' placeholder='program name' name='name' onChange={handleChange}/>
+      <div id='redtext2' className='redtext'></div>
+      <label for='description'>Description</label>
       <input type="text" id='description' placeholder='description' name='description' onChange={handleChange}/>
       <div style={{width:"600px"}}>
       <div style={{width:"50%", float:"left"}}>
           <div>
+            <div id='redtext3' className='redtext'></div>
             <label for='max_capacity'>Maximum Capacity</label>
           </div>
       <input type="number" id="max_capacity" name="max_capacity" min="1" max="9999" onChange={handleChange}/>
       </div>
       <div style={{width:"50%", float:"right"}}>
         <div>
+          <div id='redtext4' className='redtext'></div>
           <label for='current_enrollment'>Current Enrollment</label>
         </div>
       <input type="number" id='current_enrollment' name='current_enrollment' min="1" max="9999"  onChange={handleChange}/>
@@ -127,12 +145,14 @@ const CreateProgram = () => {
     <div style={{width:"600px"}}>
       <div style={{width:"50%", float:"left"}}>
         <div>
-        <label for='base_price'>Base Price</label>
+          <div id='redtext5' className='redtext'></div>
+          <label for='base_price'>Base Price</label>
         </div>
         <input type="number" id='base_price' name='base_price' min="1" max="9999" onChange={handleChange}/>
         </div>
         <div style={{width:"50%", float:"right"}}>
           <div>
+            <div id='redtext6' className='redtext'></div>
             <label for='member_price'>Member Price</label>
           </div>
         <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange}/>
@@ -143,16 +163,19 @@ const CreateProgram = () => {
       </div>
       </div>
       <div>
+      <div id='redtext9' className='redtext'></div>
       <label for='start'>start date</label>
-      <input type="date" id="start" name="start_date"onBlur={startDatess}/>
+      <input type="date" id="start" name="start_date"/>
+      <div id='redtext10' className='redtext'></div>
       <label for='end'>end date</label>
       <input type="date" id="end" name="end_date"/>
       </div>
       <div>
+      <div id='redtext7' className='redtext'></div>
       <label for='start_time'>start time</label>
       <input type="time" id="start_time" name="start_time" required/>
-
-      <label for='start_time'>end time</label>
+      <div id='redtext8' className='redtext'></div>
+      <label for='end_time'>end time</label>
       <input type="time" id="end_time" name="end_time"required/>
       </div>
       <div>

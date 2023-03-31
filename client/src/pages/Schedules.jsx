@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import axios from "axios"
 import Cookies from 'js-cookie'
 import {useNavigate} from "react-router-dom"
+import iiii from './YMCA-Logo-2010.png'
 
 const Schedules = () => {
     const navigate = useNavigate();
@@ -71,6 +72,26 @@ const Schedules = () => {
             return post
           }
           return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+        }).filter(post=>{
+          if(document.getElementById('searchTime').value == ""){
+            return post
+          }
+          return post.start_time >= document.getElementById('searchTime').value;
+        }).filter(post=>{
+          if(document.getElementById('searchDate').value == ""){
+            return post
+        }
+          return post.start_date >= document.getElementById('searchDate').value;
+        }).filter(post=>{
+          if(document.getElementById('searchprice').value == ""){
+            return post
+          }
+          return ((document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2))
+            ? (post.member_price<=document.getElementById('searchprice').value): (post.base_price<=document.getElementById('searchprice').value));
+          //post.base_price <=document.getElementById('searchprice').value;
+
+          /*document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)
+          ? (post.member_price<=document.getElementById('searchprice').value):(post.base_price<=document.getElementById('searchprice').value))*/
         });
         setstate({
           query: document.getElementById('searchname').value,
@@ -103,7 +124,7 @@ const Schedules = () => {
           <div class="container">
             <div class="row">
               <div class="col-sm">
-              <a href="/"><img src='https://capitalymca.org/wp-content/uploads/2017/08/y-trenton-site-icon.png' height='75px'></img></a>
+              <a href="/"><img src={iiii} height='100px' style={{verticalAlign:"baseline"}}></img></a>
               </div>
               <div class="col-sm">
               <a href="/programs/">Programs</a>
@@ -127,15 +148,15 @@ const Schedules = () => {
       </div>
 
       <table class='table'>
-          <thead bgcolor='#F47920'>
-            <tr>
+          <thead bgcolor='purple'>
+
             <th>Name</th>
             <th>Day</th>
             <th>Time</th>
             <th>Start/End Date</th>
             <th>Price</th>
             <th>Capacity (current/max)</th>
-            </tr>
+
           </thead>
 
           <tbody>
@@ -153,9 +174,9 @@ const Schedules = () => {
               <option value="Sunday">Sunday</option>
             </select>
             </td>
-            <td>f</td>
-            <td>f</td>
-            <td>d</td>
+            <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
+            <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
+            <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
             <td>d</td>
             <td>d</td>
             </tr>

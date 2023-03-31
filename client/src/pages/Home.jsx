@@ -5,7 +5,10 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import sha256 from 'crypto-js/sha256.js'
-
+import iiii from './YMCA-Logo-2010.png'
+import picO from './pic4.jpg'
+import pic1 from './pic1.jpg'
+import pic2 from './pic2.jpg'
 
 
 
@@ -170,7 +173,7 @@ async function RegRedirect(e){
               <div class="container">
                     <div class="row">
                         <div class="col-sm">
-                        <a href="/"><img src='https://capitalymca.org/wp-content/uploads/2017/08/y-trenton-site-icon.png' height='75px'></img></a>
+                        <a href="/"><img src={iiii} height='100px' style={{verticalAlign:"baseline"}}></img></a>
                         </div>
                         <div class="col-sm">
                         <a href="/programs/">Programs</a>
@@ -267,8 +270,16 @@ async function RegRedirect(e){
                   </div>))
                 :(<div>
                       {/*not logged in, get this view*/}
-                      <div style={{width:"600px", marginLeft:"40%", marginRight:"auto", marginTop:"30px"}}>
-                        <div className='form' style={{width:"50%", float:"left"}}>
+                    <div>
+                      <div style={{marginLeft:"1%", width:"45%", float:"left"}}>
+                        <marquee behavior="alternate">
+                          <img src={picO}></img>
+                          <img src={pic1}></img>
+                          <img src={pic2}></img>
+                        </marquee>
+                      </div>
+                      <div style={{width:"66%", marginLeft:"33%", marginRight:"auto", marginTop:"4px"}}>
+                        <div className='form' style={{marginLeft:"10%", width:"33%", float:"left"}}>
                           <h1>Sign Up!</h1>
                           <div id='redtext' className='redtext'></div>
                           <input type="text" id='email' placeholder='email' name='email' onChange={handleChange}/>
@@ -280,7 +291,7 @@ async function RegRedirect(e){
                           <label for="staff">Create staff account</label><br></br>
                           <button className='formButton' onClick={handleClickAdd}>Submit</button>
                         </div>
-                        <div className='form' style={{width:"50%", float:"right", margin_top:"100px"}}>
+                        <div className='form' style={{width:"33%", margin_top:"100px"}}>
                           <h1>Log In!</h1>
                           <div id='redtext' className='redtext'></div>
                           <input type="text" id='email_field' placeholder='email' name='email' onChange={handleChange}/>
@@ -288,6 +299,7 @@ async function RegRedirect(e){
                           <button className='formButton' onClick={handleClickLogin}>Submit</button>
                         </div>
                       </div>
+                    </div>
                   </div>)
               }
 

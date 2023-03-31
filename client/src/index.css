@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  background-color: whitesmoke;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -16,8 +17,6 @@ code {
   display:flex;
   flex-direction: column;
   gap:20px;
-  margin: auto;
-  width: 50%;
   align-items: center;
 }
 
@@ -33,23 +32,26 @@ input{
   padding:10px;
   border:none;
   padding:10px;
-  color:white;
-  background-color: #F47920;
+  color:whitesmoke;
+  background-color: purple;
   border-radius: 10px;
 }
 
 .container{
   align-items: center;
   text-align: center;
-  
+}
+.col-sm{
+  padding-top: 10px;
+  margin-bottom: -10px;
 }
 
 header{
-  background-color: #F47920;
+  background-color: purple;
 }
 
 .background{
-  background-color: #F47920;
+  background-color: black;
 }
 
 .redtext{
@@ -65,10 +67,14 @@ thead{
   color: #FFFFFF;
 }
 
-tr{
+th{
   font-size: x-large;
 }
 
+tr{
+  font-size: x-large;
+  background-color: lightcyan;
+}
 tr:nth-child(even) {
-  background-color: #f0c6a8;
+  background-color: #9932cc;
 }
