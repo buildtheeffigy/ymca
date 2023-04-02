@@ -88,10 +88,6 @@ const Schedules = () => {
           }
           return ((document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2))
             ? (post.member_price<=document.getElementById('searchprice').value): (post.base_price<=document.getElementById('searchprice').value));
-          //post.base_price <=document.getElementById('searchprice').value;
-
-          /*document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)
-          ? (post.member_price<=document.getElementById('searchprice').value):(post.base_price<=document.getElementById('searchprice').value))*/
         });
         setstate({
           query: document.getElementById('searchname').value,
@@ -117,7 +113,7 @@ const Schedules = () => {
 
 
 
-      return <div class='container'>
+      return <div>
 
       <div>
       <header>
@@ -146,7 +142,7 @@ const Schedules = () => {
           </div>
       </header>
       </div>
-
+      <div class='container'>
       <table class='table'>
           <thead bgcolor='purple'>
 
@@ -197,6 +193,7 @@ const Schedules = () => {
 
           </tbody>
       </table>
+      </div>
     </div>
 }
 

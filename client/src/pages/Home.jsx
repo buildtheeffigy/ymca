@@ -14,6 +14,16 @@ import pic2 from './pic2.jpg'
 
 const Home = () => {
 
+  const [schedules, setSchedules] = useState([])
+
+
+
+    const [query, setQuery] = useState('');
+    const [state, setstate] = useState({
+      query: '',
+      list: schedules
+    });
+
   const [user, setUser] = useState({
       email: "",
       username: "",
@@ -66,11 +76,11 @@ const handleClickAdd = async e =>{
       const email_field = document.getElementById("email");
       const username_field = document.getElementById('username');
       if(result.data[0].email == email_field.value && result.data[0].username == username_field.value){
-        document.getElementById("redtext").innerHTML = "Email and username already in use!";
+        document.getElementById("redtext1").innerHTML = "Email and username already in use!";
       }else if(result.data[0].email == email_field.value ){
-        document.getElementById("redtext").innerHTML = "Email already in use!";
+        document.getElementById("redtext1").innerHTML = "Email already in use!";
       }else if(result.data[0].username == username_field.value){
-        document.getElementById("redtext").innerHTML = "Username already in use!";
+        document.getElementById("redtext1").innerHTML = "Username already in use!";
       }
       //navigate("/add");
     }
@@ -87,7 +97,7 @@ const handleClickLogin = async e =>{
     const result = await axios.post("http://localhost:8802/login", user);
     console.log(result)
     if(result.data.length == 0){
-      document.getElementById("redtext").innerHTML = "User does not exist!";
+      document.getElementById("redtext2").innerHTML = "User does not exist!";
     }
     else if(result.data[0].password == sha256(document.getElementById('password_field').value)){ // correct password
       document.cookie = "user_id=" + JSON.stringify(result.data[0]) + "; path=/;";
@@ -98,7 +108,7 @@ const handleClickLogin = async e =>{
       }
       navigate("/");
     }else{
-      document.getElementById("redtext").innerHTML = "Password is incorrect!";
+      document.getElementById("redtext2").innerHTML = "Password is incorrect!";
     }
 
   }catch(err){
@@ -167,6 +177,58 @@ async function RegRedirect(e){
   navigate("/Registrations/");
 }
 
+//Private user
+const handleQuery = () =>{
+  setQuery(document.getElementById('searchname').value);
+  const results = schedules.filter(post => {
+    if(document.getElementById('searchname').value == "") return post
+    return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
+  }).filter(post =>{
+    console.log(JSON.parse(Cookies.get('user_id')).id);
+    console.log(post);
+    return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+  }).filter(post => {
+    if(document.getElementById('week').value.toLowerCase() == 'day'){
+      return post
+    }
+    return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+  }).filter(post=>{
+    if(document.getElementById('searchTime').value == ""){
+      return post
+    }
+    return post.start_time >= document.getElementById('searchTime').value;
+  }).filter(post=>{
+    if(document.getElementById('searchDate').value == ""){
+      return post
+  }
+    return post.start_date >= document.getElementById('searchDate').value;
+  }).filter(post=>{
+    if(document.getElementById('searchprice').value == ""){
+      return post
+    }
+    return ((document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2))
+      ? (post.member_price<=document.getElementById('searchprice').value): (post.base_price<=document.getElementById('searchprice').value));
+  });
+  setstate({
+    query: document.getElementById('searchname').value,
+    list: results
+  });
+  //alert(state.query);
+}
+useEffect(() => {
+  const fetchAllSchedules = async ()=>{
+    try{
+        const res = await axios.get("http://localhost:8802/schedules");
+        setSchedules(res.data)
+        state.list = res.data
+    }catch(err){
+        console.log(err)
+    }
+  }
+  fetchAllSchedules()
+
+}, [])
+
   return (
     <div>
         <header>
@@ -206,8 +268,64 @@ async function RegRedirect(e){
                 document.cookie ? (JSON.parse(Cookies.get('user_id')).private == 1 ?
                 (//Staff view
                   <div>
+
+
+
+
+
                     <button class="btn btn-secondary btn-lg" onClick={() => createProgRedirect()}>Create Program!</button>
                     <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
+
+                    <div class='container'>
+                    <table class='table'>
+                        <thead bgcolor='purple'>
+
+                          <th>Name</th>
+                          <th>Day</th>
+                          <th>Time</th>
+                          <th>Start/End Date</th>
+                          <th>Price</th>
+                          <th>Capacity (current/max)</th>
+
+                        </thead>
+
+                        <tbody onLoad={handleQuery}>
+                          <tr>
+                          <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
+                          <td>
+                          <select name="week" id="week" onChange={handleQuery}>
+                            <option value="day">Choose day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                            <option value="Sunday">Sunday</option>
+                          </select>
+                          </td>
+                          <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
+                          <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
+                          <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
+                          <td>d</td>
+                          <td>d</td>
+                          </tr>
+                        {state.list.map(schedule=>(
+                            <tr key={schedule.id}>
+                                <td>{schedule.name}</td>
+                                <td>{schedule.day_of_week}</td>
+                                <td>{schedule.start_time}  {schedule.end_time}</td>
+                                <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
+                                {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
+                                <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
+
+                            </tr>
+                        ))}
+
+                        </tbody>
+                    </table>
+                    </div>
+
                   </div>
                 )
                 :(//Customer view
@@ -281,7 +399,7 @@ async function RegRedirect(e){
                       <div style={{width:"66%", marginLeft:"33%", marginRight:"auto", marginTop:"4px"}}>
                         <div className='form' style={{marginLeft:"10%", width:"33%", float:"left"}}>
                           <h1>Sign Up!</h1>
-                          <div id='redtext' className='redtext'></div>
+                          <div id='redtext1' className='redtext'></div>
                           <input type="text" id='email' placeholder='email' name='email' onChange={handleChange}/>
                           <input type="text" id='username' placeholder='username' name='username' onChange={handleChange}/>
                           <input type="text" placeholder='first name' name='first_name'  onChange={handleChange}/>
@@ -293,7 +411,7 @@ async function RegRedirect(e){
                         </div>
                         <div className='form' style={{width:"33%", margin_top:"100px"}}>
                           <h1>Log In!</h1>
-                          <div id='redtext' className='redtext'></div>
+                          <div id='redtext2' className='redtext'></div>
                           <input type="text" id='email_field' placeholder='email' name='email' onChange={handleChange}/>
                           <input type="password" id='password_field' placeholder='password' name='password' onChange={handleChange}/>
                           <button className='formButton' onClick={handleClickLogin}>Submit</button>
