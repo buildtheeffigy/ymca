@@ -72,6 +72,18 @@ const CreateProgram = () => {
             } else if(endDate < starDate){
               document.getElementById("redtext10").innerHTML = "End date is earlier than start date!";
             }
+
+            if(document.getElementById("Monday").checked == false &&
+            document.getElementById("Tuesday").checked == false &&
+            document.getElementById("Wednesday").checked == false &&
+            document.getElementById("Thursday").checked == false &&
+            document.getElementById("Friday").checked == false &&
+            document.getElementById("Saturday").checked == false &&
+            document.getElementById("Sunday").checked == false
+            ){
+              document.getElementById("redtextweek").innerHTML = "Must enter days!";
+            }
+
             var numInvalids=0;
             for(let i=0; i<assd.length; i++){
               if(assd[i].innerHTML!=""){
@@ -84,27 +96,47 @@ const CreateProgram = () => {
                 const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
 
                 if(prereq_id.data.length != 0){
-                  const result = await axios.post("http://localhost:8802/createprogram2", program); // prereq
-                  const result2 = await axios.post("http://localhost:8802/scheduletable",
-                                        {program_id: result.data.insertId,
-                                        start_time: document.getElementById("start_time").value,
-                                        end_time: document.getElementById("end_time").value,
-                                        day_of_week: document.getElementById("week").value,
-                                        start_date: document.getElementById("start").value,
-                                        end_date: document.getElementById("end").value}); // insert into schedules
+                  
+
+                  const weekarray=document.getElementsByClassName("weekday");
+                  for(let i=0; i<weekarray.length; i++){
+                     if(weekarray[i].checked){
+                      const result = await axios.post("http://localhost:8802/createprogram2", program); // prereq
+                      const result2 = await axios.post("http://localhost:8802/scheduletable",
+                      {program_id: result.data.insertId,
+                      start_time: document.getElementById("start_time").value,
+                      end_time: document.getElementById("end_time").value,
+                      day_of_week: weekarray[i].value,
+                      start_date: document.getElementById("start").value,
+                      end_date: document.getElementById("end").value}); // insert into schedules
+                     }
+                    }
+
+
+                  
                   navigate("/");
-                }else{{document.getElementById('start_time').valueAsDate = new Date()}
+                }else{
+                  //{document.getElementById('start_time').valueAsDate = new Date()}
                   alert("Prerequisite class does not exist!  (Name must match previous class name)");
                 }
               }else{
-                const result = await axios.post("http://localhost:8802/createprogram", program);
-                const result2 = await axios.post("http://localhost:8802/scheduletable",
+                
+
+                const weekarray=document.getElementsByClassName("weekday");
+               for(let i=0; i<weekarray.length; i++){
+                  if(weekarray[i].checked){
+                    const result = await axios.post("http://localhost:8802/createprogram", program);
+                    const result2 = await axios.post("http://localhost:8802/scheduletable",
                                         {program_id: result.data.insertId,
                                         start_time: document.getElementById("start_time").value,
                                         end_time: document.getElementById("end_time").value,
-                                        day_of_week: document.getElementById("week").value,
+                                        day_of_week: weekarray[i].value,
                                         start_date: document.getElementById("start").value,
                                         end_date: document.getElementById("end").value}); // insert into schedules
+                  }
+                 }
+
+                
                 navigate("/");
               }
               //document.getElementById("redtext").innerHTML = "";
@@ -177,18 +209,27 @@ const CreateProgram = () => {
       <div id='redtext8' className='redtext'></div>
       <label for='end_time'>end time</label>
       <input type="time" id="end_time" name="end_time"required/>
+      <div id='redtextweek' className='redtext'></div>
       </div>
       <div>
-      <label for='week'>Day of Week</label>
-      <select name="week" id="week">
-        <option value="Monday">Monday</option>
-        <option value="Tuesday">Tuesday</option>
-        <option value="Wednesday">Wednesday</option>
-        <option value="Thursday">Thursday</option>
-        <option value="Friday">Friday</option>
-        <option value="Saturday">Saturday</option>
-        <option value="Sunday">Sunday</option>
-        </select>
+        
+        <div id='weekboxes'>
+        <input type="checkbox" className='weekday' name="Monday" id='Monday' value='Monday'/>
+        <label for='Monday'>Monday</label>
+        <input type="checkbox" className='weekday' name="Tuesday" id='Tuesday' value='Tuesday'/>
+        <label for='Tuesday'>Tuesday</label>
+        <input type="checkbox" className='weekday' name="Wednesday" id='Wednesday' value='Wednesday'/>
+        <label for='Wednesday'>Wednesday</label>
+        <input type="checkbox" className='weekday' name="Thursday" id='Thursday' value='Thursday'/>
+        <label for='Thursday'>Thursday</label>
+        <input type="checkbox" className='weekday' name="Friday" id='Friday' value='Friday'/>
+        <label for='Friday'>Friday</label>
+        <input type="checkbox" className='weekday' name="Saturday" id='Saturday' value='Saturday'/>
+        <label for='Saturday'>Saturday</label>
+        <input type="checkbox" className='weekday' name="Sunday" id='Sunday' value='Sunday'/>
+        <label for='Sunday'>Sunday</label>
+        
+        </div>
       </div>
       <button className='formButton' onClick={handleClick}>Submit</button>
     </div>

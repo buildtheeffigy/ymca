@@ -78,3 +78,14 @@ tr{
 tr:nth-child(even) {
   background-color: #9932cc;
 }
+
+#weekboxes{
+  width: 50%;
+  display:flex;
+  margin:auto;
+}
+
+#redtextweek{
+  width:auto;
+  margin:auto;
+}

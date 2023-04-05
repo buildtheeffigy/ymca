@@ -20,9 +20,16 @@ const Schedules = () => {
             }else{
               const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: prereqname.data[0].prereq_name});
               console.log(prereq_id.data);
-              const didtheytakeit = await axios.post("http://localhost:8802/prereq3", {prereq: prereq_id.data[0].id, user_id: JSON.parse(Cookies.get('user_id')).id});
-
-              if(didtheytakeit.data.length != 0){
+              var tookany = false;
+              for(let i = 0; i < prereq_id.data.length; i++){
+                const didtheytakeit = await axios.post("http://localhost:8802/prereq3", {prereq: prereq_id.data[i].id, user_id: JSON.parse(Cookies.get('user_id')).id});
+                if(didtheytakeit.data.length != 0){
+                  tookany = true;
+                }
+              }
+              
+              //console.log(didtheytakeit.data);
+              if(tookany){
                 //took prereq, sign up
                 console.log("took prereq, sign up");
               }else{
@@ -51,63 +58,44 @@ const Schedules = () => {
           }
     }
 
+
     const [schedules, setSchedules] = useState([])
-
-
-
-      const [query, setQuery] = useState('');
-      const [state, setstate] = useState({
-        query: '',
-        list: schedules
+    
+    const [query, setQuery] = useState('');
+    const [state, setstate] = useState({
+      query: '',
+      list: schedules
+    });
+    const handleQuery = () =>{
+      setQuery(document.getElementById('searchname').value);
+      const results = schedules.filter(post => {
+        if(document.getElementById('searchname').value == "") return post
+        return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
+      }).filter(post => {
+        if(document.getElementById('week').value.toLowerCase() == 'day'){
+          return post
+        }
+        return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
       });
-
-
-      const handleQuery = () =>{
-        setQuery(document.getElementById('searchname').value);
-        const results = schedules.filter(post => {
-          if(document.getElementById('searchname').value == "") return post
-          return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
-        }).filter(post => {
-          if(document.getElementById('week').value.toLowerCase() == 'day'){
-            return post
-          }
-          return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
-        }).filter(post=>{
-          if(document.getElementById('searchTime').value == ""){
-            return post
-          }
-          return post.start_time >= document.getElementById('searchTime').value;
-        }).filter(post=>{
-          if(document.getElementById('searchDate').value == ""){
-            return post
+      setstate({
+        query: document.getElementById('searchname').value,
+        list: results
+      });
+      //alert(state.query);
+    }
+    useEffect(() => {
+      const fetchAllSchedules = async ()=>{
+        try{
+            const res = await axios.get("http://localhost:8802/schedules");
+            setSchedules(res.data)
+            state.list = res.data
+        }catch(err){
+            console.log(err)
         }
-          return post.start_date >= document.getElementById('searchDate').value;
-        }).filter(post=>{
-          if(document.getElementById('searchprice').value == ""){
-            return post
-          }
-          return ((document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2))
-            ? (post.member_price<=document.getElementById('searchprice').value): (post.base_price<=document.getElementById('searchprice').value));
-        });
-        setstate({
-          query: document.getElementById('searchname').value,
-          list: results
-        });
-        //alert(state.query);
       }
-      useEffect(() => {
-        const fetchAllSchedules = async ()=>{
-          try{
-              const res = await axios.get("http://localhost:8802/schedules");
-              setSchedules(res.data)
-              state.list = res.data
-          }catch(err){
-              console.log(err)
-          }
-        }
-        fetchAllSchedules()
-
-      }, [])
+      fetchAllSchedules()
+      
+    }, [])
 
 
 
@@ -173,8 +161,8 @@ const Schedules = () => {
             <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
             <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
             <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
-            <td>d</td>
-            <td>d</td>
+            <td></td>
+            <td></td>
             </tr>
           {state.list.map(schedule=>(
               <tr key={schedule.id}>

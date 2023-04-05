@@ -183,16 +183,18 @@ const handleQuery = () =>{
   const results = schedules.filter(post => {
     if(document.getElementById('searchname').value == "") return post
     return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
-  }).filter(post =>{
-    console.log(JSON.parse(Cookies.get('user_id')).id);
-    console.log(post);
-    return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
-  }).filter(post => {
+  })
+  //.filter(post =>{
+    //console.log(JSON.parse(Cookies.get('user_id')).id);
+    //console.log(post);
+   // return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+ // })
+  .filter(post => {
     if(document.getElementById('week').value.toLowerCase() == 'day'){
       return post
     }
     return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
-  }).filter(post=>{
+  }) .filter(post=>{
     if(document.getElementById('searchTime').value == ""){
       return post
     }
@@ -202,7 +204,8 @@ const handleQuery = () =>{
       return post
   }
     return post.start_date >= document.getElementById('searchDate').value;
-  }).filter(post=>{
+  })
+  .filter(post=>{
     if(document.getElementById('searchprice').value == ""){
       return post
     }
