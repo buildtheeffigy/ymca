@@ -58,6 +58,40 @@ app.post('/deleteaccount',(req, res)=>{
     })
 })
 
+app.post('/personalschedule', (req, res)=>{
+    const query = "SELECT schedule_id, start_time, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.enrollment LEFT JOIN new_schema.schedule on schedule.id = schedule_id LEFT JOIN new_schema.programs on programs.id = course_id WHERE user_id = '" + req.body.user_id + "';";
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+app.post('/personalschedulefamily', (req, res)=>{
+    const query = "SELECT schedule_id, start_time, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.enrollment LEFT JOIN new_schema.schedule on schedule.id = schedule_id LEFT JOIN new_schema.programs on programs.id = course_id WHERE user_id = '" + req.body.user_id + "' AND family_member_id = '" + req.body.family_member_id + "';";
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+app.post('/droppersonalclass', (req, res)=>{
+    const query = "DELETE from enrollment WHERE schedule_id = '" + req.body.schedule_id + "' AND user_id = '" + req.body.user_id + "';";
+
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+app.post('/droppersonalclassfamily', (req, res)=>{
+    const query = "DELETE from enrollment WHERE schedule_id = '" + req.body.schedule_id + "' AND user_id = '" + req.body.user_id + "' AND family_member_id = '"+ req.body.family_member_id +"';";
+
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
 app.post('/prereq', (req, res)=>{
     const query = "SELECT prereq_name FROM programs WHERE id = '" + req.body.course_id +  "'";
 
