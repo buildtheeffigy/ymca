@@ -20,7 +20,7 @@ const Home = () => {
       current_enrollment: 0,
       base_price: 0,
       member_price: 0,
-      teacher_id: JSON.parse(Cookies.get('user_id')).id,
+      teacher_id: document.cookie ? (JSON.parse(Cookies.get('user_id')).id): 0,
       name: "",
       prereq_name: ""
 
