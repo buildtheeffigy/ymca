@@ -26,6 +26,14 @@ input{
   border: 1px solid gray;
   border-radius: 10px;
 }
+.collap{
+  width:100%;
+}
+
+.cont{
+  background:lightcyan;
+  display:none;
+}
 
 .formButton{
   width:250px;

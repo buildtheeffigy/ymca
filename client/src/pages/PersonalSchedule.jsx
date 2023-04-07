@@ -8,7 +8,7 @@ const PersonalSchedule = () => {
     const navigate = useNavigate();
 
     const [schedules, setSchedules] = useState([])
-    
+
     const [query, setQuery] = useState('');
     const [state, setstate] = useState({
       query: '',
@@ -19,7 +19,7 @@ const PersonalSchedule = () => {
         if(JSON.parse(Cookies.get('user_id')).family != null){
             //family
             const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
-        
+
         }else{
             //not a family
             const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });
@@ -43,13 +43,13 @@ const PersonalSchedule = () => {
                     setSchedules(res.data)
                     state.list = res.data
                 }
-              
+
           }catch(err){
               console.log(err)
           }
         }
         fetchAllSchedules()
-        
+
       }, [])
 
   return (

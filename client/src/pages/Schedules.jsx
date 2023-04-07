@@ -10,57 +10,11 @@ const Schedules = () => {
 
 
 
-    async function handleClick(e, schedule_id){
-        try{
-            const prereqname = await axios.post("http://localhost:8802/prereq", {course_id: e});
 
-            if(prereqname.data[0].prereq_name == null){ // there is no prereq, aka good to go
-                console.log("there is no prereq, aka good to go");
-
-            }else{
-              const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: prereqname.data[0].prereq_name});
-              console.log(prereq_id.data);
-              var tookany = false;
-              for(let i = 0; i < prereq_id.data.length; i++){
-                const didtheytakeit = await axios.post("http://localhost:8802/prereq3", {prereq: prereq_id.data[i].id, user_id: JSON.parse(Cookies.get('user_id')).id});
-                if(didtheytakeit.data.length != 0){
-                  tookany = true;
-                }
-              }
-              
-              //console.log(didtheytakeit.data);
-              if(tookany){
-                //took prereq, sign up
-                console.log("took prereq, sign up");
-              }else{
-                //did not take prereq
-                console.log("didnt take prereq");
-                alert("User has not passed pike level for this class!");
-                //navigate("/about/");
-                return;
-              }
-            }
-
-            //console.log({user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e});
-            if(JSON.parse(Cookies.get('user_id')).family != 1){
-              const result = await axios.post("http://localhost:8802/enrollment", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id});
-
-            }else{
-              const result = await axios.post("http://localhost:8802/enrollment2", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id, family_member_id: Cookies.get('family_id')});
-              //alert(Cookies.get('family_id'));
-              console.log(result);
-            }
-            //console.log(e + result)
-            navigate("/");
-
-          }catch(err){
-            console.log(err);
-          }
-    }
 
 
     const [schedules, setSchedules] = useState([])
-    
+
     const [query, setQuery] = useState('');
     const [state, setstate] = useState({
       query: '',
@@ -71,7 +25,18 @@ const Schedules = () => {
       const results = schedules.filter(post => {
         if(document.getElementById('searchname').value == "") return post
         return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
-      }).filter(post => {
+      }).filter(post=>{
+          if(document.getElementById('searchTime').value == ""){
+            return post
+          }
+          return post.start_time >= document.getElementById('searchTime').value;
+        }).filter(post=>{
+          if(document.getElementById('searchprice').value == ""){
+            return post
+          }
+          return ((document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2))
+            ? (post.member_price<=document.getElementById('searchprice').value): (post.base_price<=document.getElementById('searchprice').value));
+        }).filter(post => {
         if(document.getElementById('week').value.toLowerCase() == 'day'){
           return post
         }
@@ -94,10 +59,8 @@ const Schedules = () => {
         }
       }
       fetchAllSchedules()
-      
+
     }, [])
-
-
 
 
 
@@ -124,6 +87,11 @@ const Schedules = () => {
               <div class="col-sm">
               {
                   document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
+              }
+              </div>
+              <div class="col-sm">
+              {
+                  document.cookie ? <a href="/DeleteAccount/">Delete Account</a> : <div></div>
               }
               </div>
             </div>
@@ -164,16 +132,17 @@ const Schedules = () => {
             <td></td>
             <td></td>
             </tr>
+{console.log(state.list[0])}
           {state.list.map(schedule=>(
               <tr key={schedule.id}>
                   <td>{schedule.name}</td>
                   <td>{schedule.day_of_week}</td>
                   <td>{schedule.start_time}  {schedule.end_time}</td>
                   <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
-                  {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
+                  {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
                   <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
                   {
-                    document.cookie ? <td><button onClick={() => handleClick(schedule.id, schedule.schedule_id)}>Enroll</button></td> : <td></td>
+                    document.cookie ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
                   }
 
               </tr>

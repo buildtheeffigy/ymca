@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import Cookies from 'js-cookie'
 import { useEffect } from 'react'
 import axios from "axios"
+import iiii from './YMCA-Logo-2010.png'
 const Registrations = () => {
     const [programs, setPrograms] = useState([])
 
@@ -16,7 +18,42 @@ const Registrations = () => {
         fetchAllPrograms()
       }, [])
 
-      return <div class='container'>
+      return<div>
+          <header>
+                <div class="container">
+                      <div class="row">
+                          <div class="col-sm">
+                          <a href="/"><img src={iiii} height='100px' style={{verticalAlign:"baseline"}}></img></a>
+                          </div>
+                          <div class="col-sm">
+                          <a href="/programs/">Programs</a>
+                          </div>
+                          <div class="col-sm">
+                          <a href="/about/">About</a>
+                          </div>
+                          <div class="col-sm">
+                          {
+                              document.cookie ? <a href='/'>Welcome, {Cookies.get('new_family_name')}</a> : <a href="/">Sign Up  or Log In!</a>
+                          }
+                          </div>
+                          <div class="col-sm">
+                          {
+                              document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
+                          }
+                          </div>
+                          <div class="col-sm">
+                          {
+                              document.cookie ? <a href="/DeleteAccount/">Delete Account</a> : <div></div>
+                          }
+                          </div>
+
+                      </div>
+                </div>
+
+          </header>
+
+
+      <div class='container'>
       <table class='table'>
           <thead bgcolor='#F47920'>
           <tr>
@@ -29,7 +66,7 @@ const Registrations = () => {
           <th>End Time</th>
           </tr>
           </thead>
-          <tbody> 
+          <tbody>
           {programs.map(program=>(
               <tr key={program.id}>
                 {
@@ -41,13 +78,14 @@ const Registrations = () => {
                   <td>{program.start_date.toString().split('T')[0]} {program.end_date.toString().split('T')[0]}</td>
                   <td>{program.start_time}</td>
                   <td>{program.end_time}</td>
-            
-                  
+
+
               </tr>
           ))}
 
 </tbody>
       </table>
+    </div>
     </div>
 }
 

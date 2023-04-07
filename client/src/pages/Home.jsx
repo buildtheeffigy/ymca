@@ -1,3 +1,4 @@
+///NOTE: If page doesn't load, it may be because there's an unexpected cookie. Delete site cookies, and refreash the page
 import React from 'react'
 import Cookies from 'js-cookie'
 import { useState } from 'react';
@@ -13,7 +14,17 @@ import pic2 from './pic2.jpg'
 
 
 const Home = () => {
+  const [program, setProgram] = useState({
+      description: "",
+      max_capacity: 0,
+      current_enrollment: 0,
+      base_price: 0,
+      member_price: 0,
+      teacher_id: JSON.parse(Cookies.get('user_id')).id,
+      name: "",
+      prereq_name: ""
 
+    });
   const [schedules, setSchedules] = useState([])
 
 
@@ -57,6 +68,10 @@ const Home = () => {
 
 }
 
+const handleChange2 = (e) =>{
+    setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
+  }
+
 //!!Adds new user
 const handleClickAdd = async e =>{
   e.preventDefault();
@@ -76,11 +91,11 @@ const handleClickAdd = async e =>{
       const email_field = document.getElementById("email");
       const username_field = document.getElementById('username');
       if(result.data[0].email == email_field.value && result.data[0].username == username_field.value){
-        document.getElementById("redtext1").innerHTML = "Email and username already in use!";
+        document.getElementById("redtext100").innerHTML = "Email and username already in use!";
       }else if(result.data[0].email == email_field.value ){
-        document.getElementById("redtext1").innerHTML = "Email already in use!";
+        document.getElementById("redtext100").innerHTML = "Email already in use!";
       }else if(result.data[0].username == username_field.value){
-        document.getElementById("redtext1").innerHTML = "Username already in use!";
+        document.getElementById("redtext100").innerHTML = "Username already in use!";
       }
       //navigate("/add");
     }
@@ -97,7 +112,7 @@ const handleClickLogin = async e =>{
     const result = await axios.post("http://localhost:8802/login", user);
     console.log(result)
     if(result.data.length == 0){
-      document.getElementById("redtext2").innerHTML = "User does not exist!";
+      document.getElementById("redtext200").innerHTML = "User does not exist!";
     }
     else if(result.data[0].password == sha256(document.getElementById('password_field').value)){ // correct password
       document.cookie = "user_id=" + JSON.stringify(result.data[0]) + "; path=/;";
@@ -108,7 +123,7 @@ const handleClickLogin = async e =>{
       }
       navigate("/");
     }else{
-      document.getElementById("redtext2").innerHTML = "Password is incorrect!";
+      document.getElementById("redtext200").innerHTML = "Password is incorrect!";
     }
 
   }catch(err){
@@ -184,11 +199,11 @@ const handleQuery = () =>{
     if(document.getElementById('searchname').value == "") return post
     return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
   })
-  //.filter(post =>{
-    //console.log(JSON.parse(Cookies.get('user_id')).id);
-    //console.log(post);
-   // return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
- // })
+  /*.filter(post =>{
+    console.log(JSON.parse(Cookies.get('user_id')).id);
+    console.log(post);
+    return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+  })*/
   .filter(post => {
     if(document.getElementById('week').value.toLowerCase() == 'day'){
       return post
@@ -219,18 +234,187 @@ const handleQuery = () =>{
   //alert(state.query);
 }
 useEffect(() => {
-  const fetchAllSchedules = async ()=>{
-    try{
-        const res = await axios.get("http://localhost:8802/schedules");
-        setSchedules(res.data)
-        state.list = res.data
-    }catch(err){
-        console.log(err)
-    }
-  }
-  fetchAllSchedules()
+    const fetchAllSchedules = async ()=>{
+      try{
+            if(JSON.parse(Cookies.get('user_id')).family != null){
+                    //family
+                    const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
+                    setSchedules(res.data)
+                     state.list = res.data
+                     console.log("familiy");
+            }else{
+                //not a family
+                console.log("not a family");
+                const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
+                setSchedules(res.data)
+                state.list = res.data
+            }
 
-}, [])
+      }catch(err){
+          console.log(err)
+      }
+    }
+    fetchAllSchedules()
+
+  }, [])
+
+  const DropClass = async (schedule_id) =>{
+      if(JSON.parse(Cookies.get('user_id')).family != null){
+          //family
+          const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
+
+      }else{
+          //not a family
+          const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });
+      }
+      window.location.href = '/'
+    }
+
+
+
+
+ const coooolll=()=>{
+  console.log('helll');
+  var coll = document.getElementsByClassName("collap");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }}
+
+    const handleClickNex = async e =>{
+      e.preventDefault();
+
+      try{
+          //alert(JSON.parse(Cookies.get('user_id')).id);
+          const assd=document.getElementsByClassName("redtext");
+          for(let i=0; i<assd.length; i++){
+            assd[i].innerHTML = "";
+          }
+          var q = new Date();
+          var date = new Date(q.getFullYear(),q.getMonth(),q.getDate());
+          var starDate = new Date(document.getElementById('start').value);
+          var endDate = new Date(document.getElementById('end').value);
+          if(document.getElementById("name").value == ""){
+            document.getElementById("redtext1").innerHTML = "Must enter program name!";
+          } if(document.getElementById("description").value == ""){
+            document.getElementById("redtext2").innerHTML = "Must enter description name!";
+          } if(document.getElementById("max_capacity").value == ""){
+            document.getElementById("redtext3").innerHTML = "Must enter maximum capacity!";
+          }else if(document.getElementById("max_capacity").value == "0"){
+            document.getElementById("redtext3").innerHTML = "Mac capacity must be greater than zero!";
+          }
+           if(document.getElementById("current_enrollment").value == ""){
+            document.getElementById("redtext4").innerHTML = "Must enter current enrollment!";
+          } if(document.getElementById("base_price").value == ""){
+            document.getElementById("redtext5").innerHTML = "Must enter base price!";
+          }
+           if(document.getElementById("member_price").value == ""){
+            document.getElementById("redtext6").innerHTML = "Must enter member price!";
+          } if(document.getElementById("start_time").value == ""){
+            document.getElementById("redtext7").innerHTML = "Must enter start time!";
+          }
+           if(document.getElementById("end_time").value == ""){
+            document.getElementById("redtext8").innerHTML = "Must enter end time!";
+          }
+          else if(document.getElementById("end_time").value<document.getElementById("start_time").value){
+            document.getElementById("redtext8").innerHTML = "End time can't be earlier than start time!";
+          }
+          if(document.getElementById("start").value == ""){
+            document.getElementById("redtext9").innerHTML = "Must enter start date!";
+          } else if (date > starDate) {
+            document.getElementById("redtext9").innerHTML = "Start date is in the past!";
+          }
+
+          if(document.getElementById("end").value == ""){
+            document.getElementById("redtext10").innerHTML = "Must enter end date!";
+          } else if(endDate < starDate){
+            document.getElementById("redtext10").innerHTML = "End date is earlier than start date!";
+          }
+
+          if(document.getElementById("Monday").checked == false &&
+          document.getElementById("Tuesday").checked == false &&
+          document.getElementById("Wednesday").checked == false &&
+          document.getElementById("Thursday").checked == false &&
+          document.getElementById("Friday").checked == false &&
+          document.getElementById("Saturday").checked == false &&
+          document.getElementById("Sunday").checked == false
+          ){
+            document.getElementById("redtextweek").innerHTML = "Must enter days!";
+          }
+
+          var numInvalids=0;
+          for(let i=0; i<assd.length; i++){
+            if(assd[i].innerHTML!=""){
+              numInvalids+=1
+            }
+          }
+           if(numInvalids==0){
+            if(document.getElementById("prerequisite").checked){
+
+              const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
+
+              if(prereq_id.data.length != 0){
+
+
+                const weekarray=document.getElementsByClassName("weekday");
+                for(let i=0; i<weekarray.length; i++){
+                   if(weekarray[i].checked){
+                    const result = await axios.post("http://localhost:8802/createprogram2", program); // prereq
+                    const result2 = await axios.post("http://localhost:8802/scheduletable",
+                    {program_id: result.data.insertId,
+                    start_time: document.getElementById("start_time").value,
+                    end_time: document.getElementById("end_time").value,
+                    day_of_week: weekarray[i].value,
+                    start_date: document.getElementById("start").value,
+                    end_date: document.getElementById("end").value}); // insert into schedules
+                   }
+                  }
+
+
+
+                navigate("/");
+              }else{
+                //{document.getElementById('start_time').valueAsDate = new Date()}
+                alert("Prerequisite class does not exist!  (Name must match previous class name)");
+              }
+            }else{
+
+
+              const weekarray=document.getElementsByClassName("weekday");
+             for(let i=0; i<weekarray.length; i++){
+                if(weekarray[i].checked){
+                  const result = await axios.post("http://localhost:8802/createprogram", program);
+                  const result2 = await axios.post("http://localhost:8802/scheduletable",
+                                      {program_id: result.data.insertId,
+                                      start_time: document.getElementById("start_time").value,
+                                      end_time: document.getElementById("end_time").value,
+                                      day_of_week: weekarray[i].value,
+                                      start_date: document.getElementById("start").value,
+                                      end_date: document.getElementById("end").value}); // insert into schedules
+                }
+               }
+
+
+              navigate("/");
+            }
+            //document.getElementById("redtext").innerHTML = "";
+
+
+
+          }
+      }catch(err){
+          console.log(err);
+      }
+    }
 
   return (
     <div>
@@ -271,48 +455,130 @@ useEffect(() => {
                 document.cookie ? (JSON.parse(Cookies.get('user_id')).private == 1 ?
                 (//Staff view
                   <div>
+                    <button onClick={()=> coooolll()} class="collap" >Create NEW class</button>
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"1090px"}}>{/*New programs div*/}
+                    <div className='form'>
+                      <h1>Create Program!</h1>
+                      <div id='redtext1' className='redtext'></div>
+                      <label for='name'>Name</label>
+                      <input type="text" id='name' placeholder='program name' name='name' onChange={handleChange}/>
+                      <div id='redtext2' className='redtext'></div>
+                      <label for='description'>Description</label>
+                      <input type="text" id='description' placeholder='description' name='description' onChange={handleChange}/>
+                      <div style={{width:"600px"}}>
+                      <div style={{width:"50%", float:"left"}}>
+                          <div>
+                            <div id='redtext3' className='redtext'></div>
+                            <label for='max_capacity'>Maximum Capacity</label>
+                          </div>
+                      <input type="number" id="max_capacity" name="max_capacity" min="1" max="9999" onChange={handleChange}/>
+                      </div>
+                      <div style={{width:"50%", float:"right"}}>
+                        <div>
+                          <div id='redtext4' className='redtext'></div>
+                          <label for='current_enrollment'>Current Enrollment</label>
+                        </div>
+                      <input type="number" id='current_enrollment' name='current_enrollment' min="1" max="9999"  onChange={handleChange}/>
+                      </div>
+                      </div>
+                    <div style={{width:"600px"}}>
+                      <div style={{width:"50%", float:"left"}}>
+                        <div>
+                          <div id='redtext5' className='redtext'></div>
+                          <label for='base_price'>Base Price</label>
+                        </div>
+                        <input type="number" id='base_price' name='base_price' min="1" max="9999" onChange={handleChange}/>
+                        </div>
+                        <div style={{width:"50%", float:"right"}}>
+                          <div>
+                            <div id='redtext6' className='redtext'></div>
+                            <label for='member_price'>Member Price</label>
+                          </div>
+                        <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange}/>
+                      </div>
+                      <div>
+                      <label for='Prereq'>Requires prerequisite</label>
+                      <input type="checkbox" id="prerequisite" name="prerequisite" value="prerequisite"></input>
+                      </div>
+                      </div>
+                      <div>
+                      <div id='redtext9' className='redtext'></div>
+                      <label for='start'>start date</label>
+                      <input type="date" id="start" name="start_date"/>
+                      <div id='redtext10' className='redtext'></div>
+                      <label for='end'>end date</label>
+                      <input type="date" id="end" name="end_date"/>
+                      </div>
+                      <div>
+                      <div id='redtext7' className='redtext'></div>
+                      <label for='start_time'>start time</label>
+                      <input type="time" id="start_time" name="start_time" required/>
+                      <div id='redtext8' className='redtext'></div>
+                      <label for='end_time'>end time</label>
+                      <input type="time" id="end_time" name="end_time"required/>
+                      <div id='redtextweek' className='redtext'></div>
+                      </div>
+                      <div>
 
+                        <div id='weekboxes'>
+                        <input type="checkbox" className='weekday' name="Monday" id='Monday' value='Monday'/>
+                        <label for='Monday'>Monday</label>
+                        <input type="checkbox" className='weekday' name="Tuesday" id='Tuesday' value='Tuesday'/>
+                        <label for='Tuesday'>Tuesday</label>
+                        <input type="checkbox" className='weekday' name="Wednesday" id='Wednesday' value='Wednesday'/>
+                        <label for='Wednesday'>Wednesday</label>
+                        <input type="checkbox" className='weekday' name="Thursday" id='Thursday' value='Thursday'/>
+                        <label for='Thursday'>Thursday</label>
+                        <input type="checkbox" className='weekday' name="Friday" id='Friday' value='Friday'/>
+                        <label for='Friday'>Friday</label>
+                        <input type="checkbox" className='weekday' name="Saturday" id='Saturday' value='Saturday'/>
+                        <label for='Saturday'>Saturday</label>
+                        <input type="checkbox" className='weekday' name="Sunday" id='Sunday' value='Sunday'/>
+                        <label for='Sunday'>Sunday</label>
 
+                        </div>
+                      </div>
+                      <button className='formButton' onClick={handleClickNex}>Submit</button>
+                    </div>
 
-
-
-                    <button class="btn btn-secondary btn-lg" onClick={() => createProgRedirect()}>Create Program!</button>
+                    </div>
+                    <button onClick={()=> coooolll()} class="collap" >Created classes</button>
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Classes created by this user div*/}
                     <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
+                      <div class='container'>
+                        <table class='table'>
+                          <thead bgcolor='purple'>
 
-                    <div class='container'>
-                    <table class='table'>
-                        <thead bgcolor='purple'>
+                            <th>Name</th>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Start/End Date</th>
+                            <th>Price</th>
+                            <th>Capacity (current/max)</th>
 
-                          <th>Name</th>
-                          <th>Day</th>
-                          <th>Time</th>
-                          <th>Start/End Date</th>
-                          <th>Price</th>
-                          <th>Capacity (current/max)</th>
+                          </thead>
 
-                        </thead>
-
-                        <tbody onLoad={handleQuery}>
-                          <tr>
-                          <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
-                          <td>
-                          <select name="week" id="week" onChange={handleQuery}>
-                            <option value="day">Choose day</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                          </select>
-                          </td>
-                          <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
-                          <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
-                          <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
-                          <td>d</td>
-                          <td>d</td>
-                          </tr>
+                          <tbody onLoad={handleQuery}>
+                            <tr>
+                              <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
+                              <td>
+                              <select name="week" id="week" onChange={handleQuery}>
+                              <option value="day">Choose day</option>
+                              <option value="Monday">Monday</option>
+                              <option value="Tuesday">Tuesday</option>
+                              <option value="Wednesday">Wednesday</option>
+                              <option value="Thursday">Thursday</option>
+                              <option value="Friday">Friday</option>
+                              <option value="Saturday">Saturday</option>
+                              <option value="Sunday">Sunday</option>
+                              </select>
+                              </td>
+                            <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
+                            <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
+                            <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
+                            <td>d</td>
+                            <td>d</td>
+                            </tr>
                         {state.list.map(schedule=>(
                             <tr key={schedule.id}>
                                 <td>{schedule.name}</td>
@@ -328,22 +594,52 @@ useEffect(() => {
                         </tbody>
                     </table>
                     </div>
+                    </div>
+                    <button onClick={()=> coooolll()} class="collap" >Schedule</button>
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Personal schedule div*/}
+                    <a href="/programs"><button>Add classes</button></a>
+                      <div class='container'>
+                        <table class='table'>
+                          <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Day of Week</th>
+                            <th>Start/End Time</th>
+                            <th>Start/End Date</th>
+                            <th>Price</th>
+                          </tr>
+                          {state.list.map(schedule=>(
+                            <tr key={schedule.id}>
+                              <td>{schedule.name}</td>
+                              <td>{schedule.description}</td>
+                              <td>{schedule.day_of_week}</td>
+                              <td>{schedule.start_time}  {schedule.end_time}</td>
+                              <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
+                              {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
+                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id)}>Drop Class!</button></td>
+                            </tr>
+                          ))}
+                    </table>
+                    </div>
+
+                    </div>
 
                   </div>
                 )
                 :(//Customer view
                   <div>
-                    <div style={{width:"600px", marginLeft:"30%", marginRight:"auto", marginTop:"30px"}}>{/*//Family account div*/}
+                    <button onClick={()=> coooolll()} class="collap" >Family</button>
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*//Family account div*/}
                       {
                         document.cookie && JSON.parse(Cookies.get('user_id')).family != null
                         ?
-                        <div>
-                            {/*family account view*/}
-                            <div style={{padding:"50px", background:"orange", width:"50%", float:"left"}}>
+                        <div style={{height:"500px"}}>
+                        {/*family account view*/}
+                            <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
                               <input type="text" id="fname" name="fname"></input>
                               <button class="btn btn-secondary btn-lg" id={0} onClick={() => AddMember()}>Add Family Member</button>
                             </div>
-                            <div style={{padding:"50px", background:"orange", width:"50%", float:"right"}}>
+                            <div style={{ marginRight:"20vw", width:"30vw", float:"right"}}>
                               <h1 class="display-1">Family Members</h1>
                               <h3 class="display-4">Logged in as: {JSON.parse(Cookies.get('user_id')).first_name} {JSON.parse(Cookies.get('user_id')).last_name}</h3>
                               <div>
@@ -355,38 +651,67 @@ useEffect(() => {
                         :
                         (<div>
                           {/*solo account view*/}
-                          <div style={{padding:"50px", background:"orange", width:"50%", float:"left"}}>
+                          <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
                             <button class="btn btn-secondary btn-lg" id={0} onClick={() => MakeFamily()}>Convert to family account</button>
                           </div>
-                          <div style={{padding:"50px", background:"orange", width:"50%", float:"right", height:"177.778px"}}>
+                          <div style={{ marginRight:"20vw", width:"30vw", float:"right"}}>
                             {/*this is empty intentionally. Just meant to show where memer switching will be*/}
                           </div>
                         </div>
                       )
                       }
                     </div>
-                    <div style={{width:"600px", marginLeft:"30%", marginRight:"auto", marginTop:"30px"}}>{/*member account div*/}
+                    <button onClick={()=> coooolll()} class="collap" >Membership</button>
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*member account div*/}
                         {
                           document.cookie && JSON.parse(Cookies.get('user_id')).membership_status != 2
                           ?
-                          (<div>
-                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"left"}}>
+                          (<div style={{height:"500px"}}>
+                            <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
                               <button class="btn btn-secondary btn-lg" id={0} onClick={() => UpgradeMember()}>Upgrade to a YMCA Membership!</button>
                             </div>
-                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"right"}}>
+                            <div style={{padding:"50px", width:"50%", float:"right"}}>
                               <h1 class="display-1">Currently NOT YMCA Member!</h1>
                             </div>
                           </div>)
                           :
-                          (<div>
-                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"left"}}>
+                          (<div style={{height:"500px"}}>
+                            <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
                               <button class="btn btn-secondary btn-lg" id={0} onClick={() => DowngradeMember()}>End YMCA Membership!</button>
                             </div>
-                            <div style={{padding:"50px", background:"sandyBrown", width:"50%", float:"right"}}>
+                            <div style={{padding:"50px", width:"50%", float:"right"}}>
                               <h1 class="display-1">Currently a YMCA Member!</h1>
                             </div>
                           </div>)
                         }
+                    </div>
+                    <button onClick={()=> coooolll()} class="collap" >Schedule</button>
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Personal schedule div*/}
+                    <a href="/programs"><button>Add classes</button></a>
+                      <div class='container'>
+                        <table class='table'>
+                          <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Day of Week</th>
+                            <th>Start/End Time</th>
+                            <th>Start/End Date</th>
+                            <th>Price</th>
+                          </tr>
+                          {state.list.map(schedule=>(
+                            <tr key={schedule.id}>
+                              <td>{schedule.name}</td>
+                              <td>{schedule.description}</td>
+                              <td>{schedule.day_of_week}</td>
+                              <td>{schedule.start_time}  {schedule.end_time}</td>
+                              <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
+                              {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
+                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id)}>Drop Class!</button></td>
+                            </tr>
+                          ))}
+                    </table>
+                    </div>
+
                     </div>
                   </div>))
                 :(<div>
@@ -402,7 +727,7 @@ useEffect(() => {
                       <div style={{width:"66%", marginLeft:"33%", marginRight:"auto", marginTop:"4px"}}>
                         <div className='form' style={{marginLeft:"10%", width:"33%", float:"left"}}>
                           <h1>Sign Up!</h1>
-                          <div id='redtext1' className='redtext'></div>
+                          <div id='redtext100' className='redtext'></div>
                           <input type="text" id='email' placeholder='email' name='email' onChange={handleChange}/>
                           <input type="text" id='username' placeholder='username' name='username' onChange={handleChange}/>
                           <input type="text" placeholder='first name' name='first_name'  onChange={handleChange}/>
@@ -414,7 +739,7 @@ useEffect(() => {
                         </div>
                         <div className='form' style={{width:"33%", margin_top:"100px"}}>
                           <h1>Log In!</h1>
-                          <div id='redtext2' className='redtext'></div>
+                          <div id='redtext200' className='redtext'></div>
                           <input type="text" id='email_field' placeholder='email' name='email' onChange={handleChange}/>
                           <input type="password" id='password_field' placeholder='password' name='password' onChange={handleChange}/>
                           <button className='formButton' onClick={handleClickLogin}>Submit</button>

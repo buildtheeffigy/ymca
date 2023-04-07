@@ -17,6 +17,7 @@ import Schedules from "./pages/Schedules";
 import CreateProgram from "./pages/CreateProgram";
 import Registrations from "./pages/Registrations";
 import DeleteAccount from "./pages/DeleteAccount";
+import Enroll from "./pages/Enroll";
 import PersonalSchedule from "./pages/PersonalSchedule";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/update" element={<Update/>}/>
         <Route path="/Programs" element={<Schedules/>}/>
         <Route path="/Logout" element={<Logout/>}/>
+        <Route path="/Enroll" element={<Enroll/>}/>
         <Route path="/CreateProgram" element={<CreateProgram/>}/>
         <Route path="/Registrations" element={<Registrations/>}/>
         <Route path="/DeleteAccount" element={<DeleteAccount/>}/>
