@@ -274,7 +274,6 @@ useEffect(() => {
 
 
  const coooolll=()=>{
-  console.log('helll');
   var coll = document.getElementsByClassName("collap");
     var i;
 
@@ -379,8 +378,6 @@ useEffect(() => {
                    }
                   }
 
-
-
                 navigate("/");
               }else{
                 //{document.getElementById('start_time').valueAsDate = new Date()}
@@ -400,9 +397,9 @@ useEffect(() => {
                                       day_of_week: weekarray[i].value,
                                       start_date: document.getElementById("start").value,
                                       end_date: document.getElementById("end").value}); // insert into schedules
+                                        console.log(result2);
                 }
                }
-
 
               navigate("/");
             }
@@ -545,7 +542,7 @@ useEffect(() => {
                     <button onClick={()=> coooolll()} class="collap" >Created classes</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Classes created by this user div*/}
                     <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
-                      <div class='container'>
+                      <div >
                         <table class='table'>
                           <thead bgcolor='purple'>
 
@@ -555,29 +552,31 @@ useEffect(() => {
                             <th>Start/End Date</th>
                             <th>Price</th>
                             <th>Capacity (current/max)</th>
+                            <th></th>
 
                           </thead>
 
                           <tbody onLoad={handleQuery}>
                             <tr>
-                              <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
+                              <td><label for="searchname" style={{fontSize:"20px"}}>Search by</label><input type="search" id='searchname' name='name' placeholder='Name' value={query} onChange={handleQuery}/></td>
                               <td>
-                              <select name="week" id="week" onChange={handleQuery}>
-                              <option value="day">Choose day</option>
-                              <option value="Monday">Monday</option>
-                              <option value="Tuesday">Tuesday</option>
-                              <option value="Wednesday">Wednesday</option>
-                              <option value="Thursday">Thursday</option>
-                              <option value="Friday">Friday</option>
-                              <option value="Saturday">Saturday</option>
-                              <option value="Sunday">Sunday</option>
-                              </select>
+                                <label for="week" style={{fontSize:"20px"}}>Search by</label>
+                                <select name="week" id="week" onChange={handleQuery}>
+                                  <option value="day">Weekday</option>
+                                  <option value="Monday">Monday</option>
+                                  <option value="Tuesday">Tuesday</option>
+                                  <option value="Wednesday">Wednesday</option>
+                                  <option value="Thursday">Thursday</option>
+                                  <option value="Friday">Friday</option>
+                                  <option value="Saturday">Saturday</option>
+                                  <option value="Sunday">Sunday</option>
+                                </select>
                               </td>
-                            <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
-                            <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
-                            <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
+                            <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
+                            <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
+                            <td><label for="searchprice" style={{fontSize:"20px"}}>Search by</label><input type="search" id='searchprice' name='costs' placeholder='Maximum price' onChange={handleQuery}/></td>
                             <td>d</td>
-                            <td>d</td>
+                            <td></td>
                             </tr>
                         {state.list.map(schedule=>(
                             <tr key={schedule.id}>
@@ -587,6 +586,7 @@ useEffect(() => {
                                 <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
                                 {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
                                 <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
+                                <td><button>Cancel</button></td>
 
                             </tr>
                         ))}

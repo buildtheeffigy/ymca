@@ -9,10 +9,6 @@ const Schedules = () => {
     const navigate = useNavigate();
 
 
-
-
-
-
     const [schedules, setSchedules] = useState([])
 
     const [query, setQuery] = useState('');
@@ -98,7 +94,7 @@ const Schedules = () => {
           </div>
       </header>
       </div>
-      <div class='container'>
+      <div style={{width:"80vw", marginLeft:"10vw", marginRight:"10vw"}}>
       <table class='table'>
           <thead bgcolor='purple'>
 
@@ -108,15 +104,20 @@ const Schedules = () => {
             <th>Start/End Date</th>
             <th>Price</th>
             <th>Capacity (current/max)</th>
+            <th></th>
 
           </thead>
 
           <tbody>
             <tr>
-            <td><input type="search" id='searchname' name='name' placeholder='' value={query} onChange={handleQuery}/></td>
             <td>
+              <label for="searchname" style={{fontSize:"20px"}}>Search by</label>
+              <input class="SearchFeild" type="search" id='searchname' name='name' placeholder='Name' value={query} onChange={handleQuery}/>
+            </td>
+            <td>
+            <label for="week" style={{fontSize:"20px"}}>Search by</label>
             <select name="week" id="week" onChange={handleQuery}>
-              <option value="day">Choose day</option>
+              <option value="day">Weekday</option>
               <option value="Monday">Monday</option>
               <option value="Tuesday">Tuesday</option>
               <option value="Wednesday">Wednesday</option>
@@ -126,9 +127,9 @@ const Schedules = () => {
               <option value="Sunday">Sunday</option>
             </select>
             </td>
-            <td><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
-            <td><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
-            <td><input type="search" id='searchprice' name='costs' placeholder='' onChange={handleQuery}/></td>
+            <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
+            <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input class="SearchFeild" type="date" id="searchDate" name="StartDate" placeholder='Name' onChange={handleQuery}/></td>
+            <td><label for="searchprice" style={{fontSize:"20px"}}>Search by</label><input class="SearchFeild" type="search" id='searchprice' name='costs' placeholder='Maximum price' onChange={handleQuery}/></td>
             <td></td>
             <td></td>
             </tr>

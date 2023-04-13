@@ -20,12 +20,17 @@ code {
   align-items: center;
 }
 
+.SearchFeild{
+  width: 13vw;
+}
+
 input{
   width:250px;
   padding:10px;
   border: 1px solid gray;
   border-radius: 10px;
 }
+
 .collap{
   width:100%;
 }
@@ -77,11 +82,13 @@ thead{
 
 th{
   font-size: x-large;
+
 }
 
 tr{
   font-size: x-large;
   background-color: lightcyan;
+
 }
 tr:nth-child(even) {
   background-color: #9932cc;
