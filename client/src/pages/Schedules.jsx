@@ -133,7 +133,6 @@ const Schedules = () => {
             <td></td>
             <td></td>
             </tr>
-{console.log(state.list[0])}
           {state.list.map(schedule=>(
               <tr key={schedule.id}>
                   <td>{schedule.name}</td>
@@ -141,7 +140,7 @@ const Schedules = () => {
                   <td>{schedule.start_time}  {schedule.end_time}</td>
                   <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
                   {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
-                  <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
+                  <td>{schedule.current_enrollment}/{schedule.max_capacity}</td>
                   {
                     document.cookie ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
                   }

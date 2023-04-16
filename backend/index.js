@@ -39,7 +39,7 @@ app.get("/programs", (req, res)=>{
 
 app.get("/schedules", (req, res)=>{
     //const query = "SELECT * FROM schedule INNER JOIN programs on program_id = programs.id;";
-    const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', name, day_of_week, start_time, start_date, end_time, end_date, base_price, member_price FROM schedule INNER JOIN programs on program_id = programs.id;";
+    const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', name, day_of_week, start_time, start_date, end_time, end_date, base_price, member_price, max_capacity, current_enrollment FROM schedule INNER JOIN programs on program_id = programs.id;";
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
@@ -52,6 +52,14 @@ app.post('/deleteaccount',(req, res)=>{
 
     //const values = [req.body.course_id];
 
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
+app.post('/staffschedule', (req, res)=>{
+    const query = "SELECT teacher_id, start_time, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.schedule LEFT JOIN new_schema.programs on programs.id = program_id ;";
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)

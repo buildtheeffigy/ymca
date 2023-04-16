@@ -25,14 +25,15 @@ const Home = () => {
       prereq_name: ""
 
     });
-  const [schedules, setSchedules] = useState([])
 
-
+  const [schedule, setSchedules] = useState([])
+  const [programss, setProgramss] = useState([]);
 
     const [query, setQuery] = useState('');
     const [state, setstate] = useState({
       query: '',
-      list: schedules
+      list: schedule,
+      list2: programss
     });
 
   const [user, setUser] = useState({
@@ -169,24 +170,20 @@ async function AddMember(){
   window.location.href = '/'
 }
 
-const [programs, setPrograms] = useState([])
+const [familyMem, setfamilyMem] = useState([])
 
   useEffect(() => {
-      const fetchAllPrograms = async ()=>{
+      const fetchAllfamilyMems = async ()=>{
         try{
             const res = await axios.post("http://localhost:8802/families", {user_id: JSON.parse(Cookies.get('user_id')).id});
-            setPrograms(res.data)
+            setfamilyMem(res.data)
         }catch(err){
             console.log(err)
         }
       }
-      fetchAllPrograms()
+      fetchAllfamilyMems()
     }, [])
 
-
-  async function createProgRedirect(e){
-    navigate("/CreateProgram/");
-}
 
 async function RegRedirect(e){
   navigate("/Registrations/");
@@ -194,16 +191,16 @@ async function RegRedirect(e){
 
 //Private user
 const handleQuery = () =>{
+
   setQuery(document.getElementById('searchname').value);
-  const results = schedules.filter(post => {
+  const results = programss.filter(post => {
     if(document.getElementById('searchname').value == "") return post
     return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
   })
-  /*.filter(post =>{
+  .filter(post =>{
     console.log(JSON.parse(Cookies.get('user_id')).id);
-    console.log(post);
     return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
-  })*/
+  })
   .filter(post => {
     if(document.getElementById('week').value.toLowerCase() == 'day'){
       return post
@@ -229,10 +226,15 @@ const handleQuery = () =>{
   });
   setstate({
     query: document.getElementById('searchname').value,
-    list: results
+    list: schedule,
+    list2:results
   });
   //alert(state.query);
 }
+
+
+
+
 useEffect(() => {
     const fetchAllSchedules = async ()=>{
       try{
@@ -240,14 +242,21 @@ useEffect(() => {
                     //family
                     const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
                     setSchedules(res.data)
+                    setProgramss(res.data)
                      state.list = res.data
+                     state.list2=res.data
                      console.log("familiy");
             }else{
                 //not a family
                 console.log("not a family");
+                const res2=await axios.post("http://localhost:8802/staffschedule","");
+                console.log(res2);
                 const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
+                console.log(res2);
                 setSchedules(res.data)
+                setProgramss(res2.data)
                 state.list = res.data
+                state.list2 = res2.data
             }
 
       }catch(err){
@@ -397,7 +406,6 @@ useEffect(() => {
                                       day_of_week: weekarray[i].value,
                                       start_date: document.getElementById("start").value,
                                       end_date: document.getElementById("end").value}); // insert into schedules
-                                        console.log(result2);
                 }
                }
 
@@ -458,24 +466,24 @@ useEffect(() => {
                       <h1>Create Program!</h1>
                       <div id='redtext1' className='redtext'></div>
                       <label for='name'>Name</label>
-                      <input type="text" id='name' placeholder='program name' name='name' onChange={handleChange}/>
+                      <input type="text" id='name' placeholder='program name' name='name' onChange={handleChange2}/>
                       <div id='redtext2' className='redtext'></div>
                       <label for='description'>Description</label>
-                      <input type="text" id='description' placeholder='description' name='description' onChange={handleChange}/>
+                      <input type="text" id='description' placeholder='description' name='description' onChange={handleChange2}/>
                       <div style={{width:"600px"}}>
                       <div style={{width:"50%", float:"left"}}>
                           <div>
                             <div id='redtext3' className='redtext'></div>
                             <label for='max_capacity'>Maximum Capacity</label>
                           </div>
-                      <input type="number" id="max_capacity" name="max_capacity" min="1" max="9999" onChange={handleChange}/>
+                      <input type="number" id="max_capacity" name="max_capacity" min="1" max="9999" onChange={handleChange2}/>
                       </div>
                       <div style={{width:"50%", float:"right"}}>
                         <div>
                           <div id='redtext4' className='redtext'></div>
                           <label for='current_enrollment'>Current Enrollment</label>
                         </div>
-                      <input type="number" id='current_enrollment' name='current_enrollment' min="1" max="9999"  onChange={handleChange}/>
+                      <input type="number" id='current_enrollment' name='current_enrollment' min="1" max="9999"  onChange={handleChange2}/>
                       </div>
                       </div>
                     <div style={{width:"600px"}}>
@@ -484,14 +492,14 @@ useEffect(() => {
                           <div id='redtext5' className='redtext'></div>
                           <label for='base_price'>Base Price</label>
                         </div>
-                        <input type="number" id='base_price' name='base_price' min="1" max="9999" onChange={handleChange}/>
+                        <input type="number" id='base_price' name='base_price' min="1" max="9999" onChange={handleChange2}/>
                         </div>
                         <div style={{width:"50%", float:"right"}}>
                           <div>
                             <div id='redtext6' className='redtext'></div>
                             <label for='member_price'>Member Price</label>
                           </div>
-                        <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange}/>
+                        <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange2}/>
                       </div>
                       <div>
                       <label for='Prereq'>Requires prerequisite</label>
@@ -575,17 +583,16 @@ useEffect(() => {
                             <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label><input type="time" id="searchTime" name="StartTime" onChange={handleQuery}/></td>
                             <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input type="date" id="searchDate" name="StartDate" onChange={handleQuery}/></td>
                             <td><label for="searchprice" style={{fontSize:"20px"}}>Search by</label><input type="search" id='searchprice' name='costs' placeholder='Maximum price' onChange={handleQuery}/></td>
-                            <td>d</td>
-                            <td></td>
+
                             </tr>
-                        {state.list.map(schedule=>(
-                            <tr key={schedule.id}>
-                                <td>{schedule.name}</td>
-                                <td>{schedule.day_of_week}</td>
-                                <td>{schedule.start_time}  {schedule.end_time}</td>
-                                <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
-                                {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
-                                <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
+                        {state.list2.map( programss=>(
+                            <tr key={programss.id}>
+                                <td>{programss.name}</td>
+                                <td>{programss.day_of_week}</td>
+                                <td>{programss.start_time}  {programss.end_time}</td>
+                                <td>{programss.start_date.toString().split('T')[0]}  {programss.end_date.toString().split('T')[0]}</td>
+                                {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${programss.member_price}</td>:<td>${programss.base_price}</td>}
+                                <td>{programss.current_enrollment} {programss.max_capacity}</td>
                                 <td><button>Cancel</button></td>
 
                             </tr>
@@ -610,6 +617,8 @@ useEffect(() => {
                           </tr>
                           {state.list.map(schedule=>(
                             <tr key={schedule.id}>
+                            {console.log(schedule.id)}
+                            {console.log(schedule)}
                               <td>{schedule.name}</td>
                               <td>{schedule.description}</td>
                               <td>{schedule.day_of_week}</td>
@@ -644,7 +653,7 @@ useEffect(() => {
                               <h3 class="display-4">Logged in as: {JSON.parse(Cookies.get('user_id')).first_name} {JSON.parse(Cookies.get('user_id')).last_name}</h3>
                               <div>
                                 <button class="btn btn-secondary btn-lg" id={0} onClick={() => changeFamilyMember(0, JSON.parse(Cookies.get('user_id')).first_name)}>{JSON.parse(Cookies.get('user_id')).first_name}</button>
-                                {programs.map(element=>(<button class="btn btn-secondary btn-lg" id={element.id} onClick={() => changeFamilyMember(element.id, element.name)}>{element.name}</button>))}
+                                {familyMem.map(element=>(<button class="btn btn-secondary btn-lg" id={element.id} onClick={() => changeFamilyMember(element.id, element.name)}>{element.name}</button>))}
                               </div>
                             </div>
                         </div>
