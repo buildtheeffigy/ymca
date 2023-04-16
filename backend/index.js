@@ -39,7 +39,7 @@ app.get("/programs", (req, res)=>{
 
 app.get("/schedules", (req, res)=>{
     //const query = "SELECT * FROM schedule INNER JOIN programs on program_id = programs.id;";
-    const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', name, day_of_week, start_time, start_date, end_time, end_date, base_price, member_price, max_capacity, current_enrollment FROM schedule INNER JOIN programs on program_id = programs.id;";
+    const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', teacher_id, name, day_of_week, start_time, start_date, end_time, end_date, base_price, member_price, max_capacity, current_enrollment FROM schedule INNER JOIN programs on program_id = programs.id;";
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)

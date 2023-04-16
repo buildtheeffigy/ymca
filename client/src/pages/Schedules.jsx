@@ -26,7 +26,9 @@ const Schedules = () => {
             return post
           }
           return post.start_time >= document.getElementById('searchTime').value;
-        }).filter(post=>{
+        }).filter(post =>{
+            return ((document.cookie && JSON.parse(Cookies.get('user_id')).private == 1) ? (post.teacher_id!=JSON.parse(Cookies.get('user_id')).id):(post));
+          }).filter(post=>{
           if(document.getElementById('searchprice').value == ""){
             return post
           }
@@ -49,7 +51,9 @@ const Schedules = () => {
         try{
             const res = await axios.get("http://localhost:8802/schedules");
             setSchedules(res.data)
-            state.list = res.data
+            state.list = res.data.filter(post =>{
+                return ((document.cookie && JSON.parse(Cookies.get('user_id')).private == 1) ? (post.teacher_id!=JSON.parse(Cookies.get('user_id')).id):(post));
+              });
         }catch(err){
             console.log(err)
         }

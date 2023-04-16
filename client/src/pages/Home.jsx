@@ -198,7 +198,6 @@ const handleQuery = () =>{
     return post.name.toLowerCase().includes(document.getElementById('searchname').value.toLowerCase());
   })
   .filter(post =>{
-    console.log(JSON.parse(Cookies.get('user_id')).id);
     return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
   })
   .filter(post => {
@@ -255,8 +254,13 @@ useEffect(() => {
                 console.log(res2);
                 setSchedules(res.data)
                 setProgramss(res2.data)
+
                 state.list = res.data
-                state.list2 = res2.data
+                state.list2 = res2.data.filter(post =>{
+                  console.log(JSON.parse(Cookies.get('user_id')).id);
+                  return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+                });
+
             }
 
       }catch(err){
@@ -264,7 +268,6 @@ useEffect(() => {
       }
     }
     fetchAllSchedules()
-
   }, [])
 
   const DropClass = async (schedule_id) =>{
@@ -307,6 +310,7 @@ useEffect(() => {
           for(let i=0; i<assd.length; i++){
             assd[i].innerHTML = "";
           }
+          document.getElementById("success").innerHTML="";
           var q = new Date();
           var date = new Date(q.getFullYear(),q.getMonth(),q.getDate());
           var starDate = new Date(document.getElementById('start').value);
@@ -366,6 +370,16 @@ useEffect(() => {
             }
           }
            if(numInvalids==0){
+             const resest=document.getElementsByTagName("input");
+             for(let i=0; i<resest.length; i++){
+               if(resest[i].type!="checkbox"){
+                 resest[i].value="";
+               }
+               else{
+                 resest[i].checked=false;
+               }
+             }
+             document.getElementById("success").innerHTML="Program successfully created! Check \"created programs\"!"
             if(document.getElementById("prerequisite").checked){
 
               const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
@@ -387,7 +401,15 @@ useEffect(() => {
                    }
                   }
 
+                  const res2=await axios.post("http://localhost:8802/staffschedule","");
+                  const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
+                  state.list = res.data
+                  state.list2 = res2.data.filter(post =>{
+                    console.log(JSON.parse(Cookies.get('user_id')).id);
+                    return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+                  });
                 navigate("/");
+                console.log("Reloaded2");
               }else{
                 //{document.getElementById('start_time').valueAsDate = new Date()}
                 alert("Prerequisite class does not exist!  (Name must match previous class name)");
@@ -408,8 +430,17 @@ useEffect(() => {
                                       end_date: document.getElementById("end").value}); // insert into schedules
                 }
                }
-
+               const res2=await axios.post("http://localhost:8802/staffschedule","");
+               console.log(res2);
+               const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
+               console.log(res2);
+               state.list = res.data
+               state.list2 = res2.data.filter(post =>{
+                 console.log(JSON.parse(Cookies.get('user_id')).id);
+                 return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+               });
               navigate("/");
+              console.log("Reloaded1");
             }
             //document.getElementById("redtext").innerHTML = "";
 
@@ -461,7 +492,7 @@ useEffect(() => {
                 (//Staff view
                   <div>
                     <button onClick={()=> coooolll()} class="collap" >Create NEW class</button>
-                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"1090px"}}>{/*New programs div*/}
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*New programs div*/}
                     <div className='form'>
                       <h1>Create Program!</h1>
                       <div id='redtext1' className='redtext'></div>
@@ -544,11 +575,12 @@ useEffect(() => {
                         </div>
                       </div>
                       <button className='formButton' onClick={handleClickNex}>Submit</button>
+                      <label id="success" style={{color:"blue"}}>Test</label>
                     </div>
 
                     </div>
                     <button onClick={()=> coooolll()} class="collap" >Created classes</button>
-                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Classes created by this user div*/}
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Classes created by this user div*/}
                     <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
                       <div >
                         <table class='table'>
@@ -564,7 +596,7 @@ useEffect(() => {
 
                           </thead>
 
-                          <tbody onLoad={handleQuery}>
+                          <tbody>
                             <tr>
                               <td><label for="searchname" style={{fontSize:"20px"}}>Search by</label><input type="search" id='searchname' name='name' placeholder='Name' value={query} onChange={handleQuery}/></td>
                               <td>
@@ -603,7 +635,7 @@ useEffect(() => {
                     </div>
                     </div>
                     <button onClick={()=> coooolll()} class="collap" >Schedule</button>
-                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Personal schedule div*/}
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Personal schedule div*/}
                     <a href="/programs"><button>Add classes</button></a>
                       <div class='container'>
                         <table class='table'>
@@ -638,7 +670,7 @@ useEffect(() => {
                 :(//Customer view
                   <div>
                     <button onClick={()=> coooolll()} class="collap" >Family</button>
-                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*//Family account div*/}
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*//Family account div*/}
                       {
                         document.cookie && JSON.parse(Cookies.get('user_id')).family != null
                         ?
@@ -671,7 +703,7 @@ useEffect(() => {
                       }
                     </div>
                     <button onClick={()=> coooolll()} class="collap" >Membership</button>
-                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*member account div*/}
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*member account div*/}
                         {
                           document.cookie && JSON.parse(Cookies.get('user_id')).membership_status != 2
                           ?
@@ -695,7 +727,7 @@ useEffect(() => {
                         }
                     </div>
                     <button onClick={()=> coooolll()} class="collap" >Schedule</button>
-                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", height:"500px"}}>{/*Personal schedule div*/}
+                    <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Personal schedule div*/}
                     <a href="/programs"><button>Add classes</button></a>
                       <div class='container'>
                         <table class='table'>
