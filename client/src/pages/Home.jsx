@@ -136,6 +136,9 @@ const handleClickLogin = async e =>{
 async function changeFamilyMember(e, newName){
   document.cookie = "family_id=" + e + "; path=/;";
   document.cookie = "new_family_name=" + newName + "; path=/;";
+  const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
+  setSchedules(res.data)
+  state.list = res.data
   navigate("/");
 }
 
@@ -175,6 +178,9 @@ const [familyMem, setfamilyMem] = useState([])
   useEffect(() => {
       const fetchAllfamilyMems = async ()=>{
         try{
+          /*while(!document.cookie){
+            var uuuu=4;
+          }*/
             const res = await axios.post("http://localhost:8802/families", {user_id: JSON.parse(Cookies.get('user_id')).id});
             setfamilyMem(res.data)
         }catch(err){
@@ -286,12 +292,12 @@ useEffect(() => {
 
 
  const coooolll=()=>{
+
   var coll = document.getElementsByClassName("collap");
     var i;
 
     for (i = 0; i < coll.length; i++) {
       coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
         var content = this.nextElementSibling;
         if (content.style.display === "block") {
           content.style.display = "none";
@@ -299,7 +305,8 @@ useEffect(() => {
           content.style.display = "block";
         }
       });
-    }}
+    }
+  }
 
     const handleClickNex = async e =>{
       e.preventDefault();
@@ -370,15 +377,6 @@ useEffect(() => {
             }
           }
            if(numInvalids==0){
-             const resest=document.getElementsByTagName("input");
-             for(let i=0; i<resest.length; i++){
-               if(resest[i].type!="checkbox"){
-                 resest[i].value="";
-               }
-               else{
-                 resest[i].checked=false;
-               }
-             }
              document.getElementById("success").innerHTML="Program successfully created! Check \"created programs\"!"
             if(document.getElementById("prerequisite").checked){
 
@@ -398,6 +396,8 @@ useEffect(() => {
                     day_of_week: weekarray[i].value,
                     start_date: document.getElementById("start").value,
                     end_date: document.getElementById("end").value}); // insert into schedules
+                    console.log(result);
+                    console.log(result2);
                    }
                   }
 
@@ -405,11 +405,22 @@ useEffect(() => {
                   const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
                   state.list = res.data
                   state.list2 = res2.data.filter(post =>{
-                    console.log(JSON.parse(Cookies.get('user_id')).id);
                     return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                   });
+                  const resest=document.getElementsByTagName("input");
+                  while(res2.data.length==[]){
+                    var fasas=4;
+                  }
+                  for(let i=0; i<resest.length; i++){
+                    if(resest[i].type!="checkbox"){
+                      resest[i].value="";
+                    }
+                    else{
+                      resest[i].checked=false;
+                    }
+                  }
                 navigate("/");
-                console.log("Reloaded2");
+
               }else{
                 //{document.getElementById('start_time').valueAsDate = new Date()}
                 alert("Prerequisite class does not exist!  (Name must match previous class name)");
@@ -428,17 +439,29 @@ useEffect(() => {
                                       day_of_week: weekarray[i].value,
                                       start_date: document.getElementById("start").value,
                                       end_date: document.getElementById("end").value}); // insert into schedules
+                                      console.log(result);
+                                      console.log(result2);
                 }
                }
                const res2=await axios.post("http://localhost:8802/staffschedule","");
-               console.log(res2);
                const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
-               console.log(res2);
                state.list = res.data
                state.list2 = res2.data.filter(post =>{
                  console.log(JSON.parse(Cookies.get('user_id')).id);
                  return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                });
+               const resest=document.getElementsByTagName("input");
+               while(res2.data.length==[]){
+                 var fasas=4;
+               }
+               for(let i=0; i<resest.length; i++){
+                 if(resest[i].type!="checkbox"){
+                   resest[i].value="";
+                 }
+                 else{
+                   resest[i].checked=false;
+                 }
+               }
               navigate("/");
               console.log("Reloaded1");
             }
@@ -685,7 +708,7 @@ useEffect(() => {
                               <h3 class="display-4">Logged in as: {JSON.parse(Cookies.get('user_id')).first_name} {JSON.parse(Cookies.get('user_id')).last_name}</h3>
                               <div>
                                 <button class="btn btn-secondary btn-lg" id={0} onClick={() => changeFamilyMember(0, JSON.parse(Cookies.get('user_id')).first_name)}>{JSON.parse(Cookies.get('user_id')).first_name}</button>
-                                {familyMem.map(element=>(<button class="btn btn-secondary btn-lg" id={element.id} onClick={() => changeFamilyMember(element.id, element.name)}>{element.name}</button>))}
+                                {familyMem.map(element=>(<button class="btn btn-secondary btn-lg" id={element.id} name={element.name} onClick={() => changeFamilyMember(element.id, element.name)}>{element.name}</button>))}
                               </div>
                             </div>
                         </div>

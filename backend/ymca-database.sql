@@ -136,8 +136,9 @@ CREATE TABLE IF NOT EXISTS `new_schema`.`families` (
   `user_id` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `user_id`
-    FOREIGN KEY (`id`)
+  INDEX `uuid` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `uuid`
+    FOREIGN KEY (`user_id`)
     REFERENCES `new_schema`.`users` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
