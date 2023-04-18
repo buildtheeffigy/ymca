@@ -169,8 +169,18 @@ async function MakeFamily(){
 }
 
 async function AddMember(){
-  const res = await axios.post("http://localhost:8802/familymember", {user_id: JSON.parse(Cookies.get('user_id')).id, name: document.getElementById("fname").value});
-  window.location.href = '/'
+  if(document.getElementById("fname").value==''){
+    document.getElementById("redtextfam").innerHTML="Enter the family member's name!";
+  }
+  else{
+    if(familyMem.length>=7){
+      document.getElementById("redtextfam").innerHTML="Your family is full!";
+    }
+    else{
+      const res = await axios.post("http://localhost:8802/familymember", {user_id: JSON.parse(Cookies.get('user_id')).id, name: document.getElementById("fname").value});
+      window.location.href = '/'
+    }
+  }
 }
 
 const [familyMem, setfamilyMem] = useState([])
@@ -700,6 +710,7 @@ useEffect(() => {
                         <div style={{height:"500px"}}>
                         {/*family account view*/}
                             <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
+                            <div id='redtextfam' className='redtext'></div>
                               <input type="text" id="fname" name="fname"></input>
                               <button class="btn btn-secondary btn-lg" id={0} onClick={() => AddMember()}>Add Family Member</button>
                             </div>
