@@ -14,7 +14,7 @@ const Enroll = () =>{
     list: schedules
 });
 
-const DropClass = async (schedule_id) =>{
+const DropClass = async (schedule_id, program_id, capac) =>{
     if(JSON.parse(Cookies.get('user_id')).family != null){
         //family
         const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
@@ -23,12 +23,13 @@ const DropClass = async (schedule_id) =>{
         //not a family
         const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });
     }
+    const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:capac-1, program_id: program_id});
     window.location.href = '/Enroll'
   }
 
   const dropConflicts = () =>{
     for(let i=0; i<state.list.length; i++){
-      DropClass(state.list[i].schedule_id);
+      DropClass(state.list[i].schedule_id,state.list[i].program_id,parseInt(state.list[i].current_enrollment));
     }
   }
 
@@ -54,6 +55,7 @@ const results = schedules.filter(dsf);
 
 
 async function handleClick(e, schedule_id){
+  console.log("Error reporting soft");
     try{
       setQuery("");
         const prereqname = await axios.post("http://localhost:8802/prereq", {course_id: e});
@@ -76,6 +78,7 @@ async function handleClick(e, schedule_id){
           if(tookany){
             //took prereq, sign up
             console.log("took prereq, sign up");
+
           }else{
             //did not take prereq
             console.log("didnt take prereq");
@@ -86,6 +89,9 @@ async function handleClick(e, schedule_id){
         }
 
         //console.log({user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e});
+        //!!IMPORTANT!! If the conflicting class is the same as the one being enrolled in, then when the user drops the class, THE COOKIE DATA IS NOT UPDATED. That's why re-enrolling in the class increases the previous enrollment by 1, rather than
+        //keeping it constant.
+        const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:parseInt(JSON.parse(Cookies.get("program")).current_enrollment)+1, program_id: JSON.parse(Cookies.get("program")).id});
         if(JSON.parse(Cookies.get('user_id')).family != 1){
           const result = await axios.post("http://localhost:8802/enrollment", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id});
 

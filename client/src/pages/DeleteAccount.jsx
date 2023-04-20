@@ -59,7 +59,7 @@ const DeleteAccount = () => {
 export default DeleteAccount
 
 
-const DropClass = async (schedule_id) =>{
+const DropClass = async (schedule_id, program_id, capac) =>{
     if(JSON.parse(Cookies.get('user_id')).family != null){
         //family
         const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
@@ -68,4 +68,5 @@ const DropClass = async (schedule_id) =>{
         //not a family
         const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });
     }
+    const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:capac-1, program_id: program_id});
   }

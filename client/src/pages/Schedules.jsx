@@ -146,7 +146,7 @@ const Schedules = () => {
                   {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
                   <td>{schedule.current_enrollment}/{schedule.max_capacity}</td>
                   {
-                    document.cookie ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
+                    (document.cookie && schedule.current_enrollment<schedule.max_capacity) ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
                   }
 
               </tr>

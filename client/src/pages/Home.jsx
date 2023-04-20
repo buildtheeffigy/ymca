@@ -264,7 +264,7 @@ useEffect(() => {
             }else{
                 //not a family
                 console.log("not a family");
-                const res2=await axios.post("http://localhost:8802/staffschedule","");
+                const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                 console.log(res2);
                 const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
                 console.log(res2);
@@ -286,7 +286,12 @@ useEffect(() => {
     fetchAllSchedules()
   }, [])
 
-  const DropClass = async (schedule_id) =>{
+  const cancelProgram = async (program_id)=>{
+    const res = await axios.post("http://localhost:8802/cancelProgram",{program_id: program_id});
+    window.location.href = '/'
+  }
+
+  const DropClass = async (schedule_id, program_id, capac) =>{
       if(JSON.parse(Cookies.get('user_id')).family != null){
           //family
           const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
@@ -295,6 +300,7 @@ useEffect(() => {
           //not a family
           const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });
       }
+        const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:capac-1, program_id: program_id});
       window.location.href = '/'
     }
 
@@ -341,9 +347,7 @@ useEffect(() => {
           }else if(document.getElementById("max_capacity").value == "0"){
             document.getElementById("redtext3").innerHTML = "Mac capacity must be greater than zero!";
           }
-           if(document.getElementById("current_enrollment").value == ""){
-            document.getElementById("redtext4").innerHTML = "Must enter current enrollment!";
-          } if(document.getElementById("base_price").value == ""){
+          if(document.getElementById("base_price").value == ""){
             document.getElementById("redtext5").innerHTML = "Must enter base price!";
           }
            if(document.getElementById("member_price").value == ""){
@@ -411,15 +415,16 @@ useEffect(() => {
                    }
                   }
 
-                  const res2=await axios.post("http://localhost:8802/staffschedule","");
+                  const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                   const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
                   state.list = res.data
                   state.list2 = res2.data.filter(post =>{
                     return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                   });
                   const resest=document.getElementsByTagName("input");
-                  while(res2.data.length==[]){
-                    var fasas=4;
+                  var fasas=0
+                  while((res2.data.length==[] && fasas<100)){
+                    fasas=fasas+1;
                   }
                   for(let i=0; i<resest.length; i++){
                     if(resest[i].type!="checkbox"){
@@ -453,7 +458,7 @@ useEffect(() => {
                                       console.log(result2);
                 }
                }
-               const res2=await axios.post("http://localhost:8802/staffschedule","");
+               const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
                state.list = res.data
                state.list2 = res2.data.filter(post =>{
@@ -461,8 +466,9 @@ useEffect(() => {
                  return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                });
                const resest=document.getElementsByTagName("input");
-               while(res2.data.length==[]){
-                 var fasas=4;
+               var fasas=0
+               while((res2.data.length==[] && fasas<100)){
+                 fasas=fasas+1;
                }
                for(let i=0; i<resest.length; i++){
                  if(resest[i].type!="checkbox"){
@@ -544,10 +550,9 @@ useEffect(() => {
                       </div>
                       <div style={{width:"50%", float:"right"}}>
                         <div>
-                          <div id='redtext4' className='redtext'></div>
-                          <label for='current_enrollment'>Current Enrollment</label>
+                          <label for='Prereq'>Requires prerequisite</label>
                         </div>
-                      <input type="number" id='current_enrollment' name='current_enrollment' min="1" max="9999"  onChange={handleChange2}/>
+                        <input type="checkbox" id="prerequisite" name="prerequisite" value="prerequisite"></input>
                       </div>
                       </div>
                     <div style={{width:"600px"}}>
@@ -564,10 +569,6 @@ useEffect(() => {
                             <label for='member_price'>Member Price</label>
                           </div>
                         <input type="number" id='member_price' name='member_price' min="1" max="9999" onChange={handleChange2}/>
-                      </div>
-                      <div>
-                      <label for='Prereq'>Requires prerequisite</label>
-                      <input type="checkbox" id="prerequisite" name="prerequisite" value="prerequisite"></input>
                       </div>
                       </div>
                       <div>
@@ -608,7 +609,7 @@ useEffect(() => {
                         </div>
                       </div>
                       <button className='formButton' onClick={handleClickNex}>Submit</button>
-                      <label id="success" style={{color:"blue"}}>Test</label>
+                      <label id="success" style={{color:"blue"}}></label>
                     </div>
 
                     </div>
@@ -657,8 +658,8 @@ useEffect(() => {
                                 <td>{programss.start_time}  {programss.end_time}</td>
                                 <td>{programss.start_date.toString().split('T')[0]}  {programss.end_date.toString().split('T')[0]}</td>
                                 {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${programss.member_price}</td>:<td>${programss.base_price}</td>}
-                                <td>{programss.current_enrollment} {programss.max_capacity}</td>
-                                <td><button>Cancel</button></td>
+                                <td>{programss.current_enrollment}/{programss.max_capacity}</td>
+                                <td><button onClick={()=> cancelProgram(programss.program_id)}>Cancel</button></td>
 
                             </tr>
                         ))}
@@ -690,7 +691,7 @@ useEffect(() => {
                               <td>{schedule.start_time}  {schedule.end_time}</td>
                               <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
                               {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
-                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id)}>Drop Class!</button></td>
+                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id, schedule.program_id, schedule.current_enrollment)}>Drop Class!</button></td>
                             </tr>
                           ))}
                     </table>
@@ -781,7 +782,7 @@ useEffect(() => {
                               <td>{schedule.start_time}  {schedule.end_time}</td>
                               <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
                               {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
-                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id)}>Drop Class!</button></td>
+                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id, schedule.program_id, schedule.current_enrollment)}>Drop Class!</button></td>
                             </tr>
                           ))}
                     </table>
