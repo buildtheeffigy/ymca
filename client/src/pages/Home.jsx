@@ -57,12 +57,21 @@ const Home = () => {
       //alert(e.target.checked);
       if(e.target.checked){
         setUser(prev=>({...prev, ['private']: 1}))
+        document.getElementById('admin').checked = false;
       }
       else{
         setUser(prev=>({...prev, ['private']: 0}))
       }
 
 
+    }else if(e.target.name == 'admin'){
+      if(e.target.checked){
+        setUser(prev=>({...prev, ['private']: 2}))
+        document.getElementById('staff').checked = false;
+      }
+      else{
+        setUser(prev=>({...prev, ['private']: 0}))
+      }
     }else{
       setUser(prev=>({...prev, [e.target.name]: e.target.value}))
     }
@@ -811,6 +820,8 @@ useEffect(() => {
                           <input type="password" placeholder='password' name='password' onChange={handleChange}/>
                           <input type="checkbox" name="staff" id='staff' value='staff' onChange={handleChange}/>
                           <label for="staff">Create staff account</label><br></br>
+                          <input type="checkbox" name="admin" id='admin' value='admin' onChange={handleChange}/>
+                          <label for="admin">Create admin account</label><br></br>
                           <button className='formButton' onClick={handleClickAdd}>Submit</button>
                         </div>
                         <div className='form' style={{width:"33%", margin_top:"100px"}}>

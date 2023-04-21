@@ -19,6 +19,7 @@ import Registrations from "./pages/Registrations";
 import DeleteAccount from "./pages/DeleteAccount";
 import Enroll from "./pages/Enroll";
 import PersonalSchedule from "./pages/PersonalSchedule";
+import HardDelete from "./pages/HardDelete";
 
 function App() {
   return (
@@ -36,6 +37,8 @@ function App() {
         <Route path="/Registrations" element={<Registrations/>}/>
         <Route path="/DeleteAccount" element={<DeleteAccount/>}/>
         <Route path="/PersonalSchedule" element={<PersonalSchedule/>}/>
+        <Route path="/HardDelete" element={<HardDelete/>}/>
+
         </Routes>
       </BrowserRouter>
     </div>

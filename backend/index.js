@@ -58,6 +58,15 @@ app.post('/deleteaccount',(req, res)=>{
     })
 })
 
+app.post('/harddelete', (req, res)=>{
+    const query = "DELETE from users WHERE id = '" + req.body.user_id + "'";
+
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+    })
+})
+
 app.post('/staffschedule', (req, res)=>{
     const query = "SELECT teacher_id, program_id, start_time, canceled, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.schedule LEFT JOIN new_schema.programs on programs.id = program_id WHERE teacher_id="+req.body.teach_id+" AND canceled=0;";
     db.query(query, (err, data)=>{
