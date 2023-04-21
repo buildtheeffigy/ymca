@@ -63,7 +63,6 @@ const DropClass = async (schedule_id, program_id, capac) =>{
     if(JSON.parse(Cookies.get('user_id')).family != null){
         //family
         const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
-
     }else{
         //not a family
         const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });

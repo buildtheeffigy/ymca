@@ -16,6 +16,8 @@ const Schedules = () => {
       query: '',
       list: schedules
     });
+
+    //Search programs function
     const handleQuery = () =>{
       setQuery(document.getElementById('searchname').value);
       const results = schedules.filter(post => {
@@ -44,8 +46,9 @@ const Schedules = () => {
         query: document.getElementById('searchname').value,
         list: results
       });
-      //alert(state.query);
     }
+
+    //loads program data
     useEffect(() => {
       const fetchAllSchedules = async ()=>{
         try{
@@ -59,7 +62,6 @@ const Schedules = () => {
         }
       }
       fetchAllSchedules()
-
     }, [])
 
 
@@ -146,6 +148,7 @@ const Schedules = () => {
                   {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
                   <td>{schedule.current_enrollment}/{schedule.max_capacity}</td>
                   {
+                    /*This button creates a cookie containing the data for the program the user is trying to enroll in, before sending the user to the enroll page*/
                     (document.cookie && schedule.current_enrollment<schedule.max_capacity) ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
                   }
 

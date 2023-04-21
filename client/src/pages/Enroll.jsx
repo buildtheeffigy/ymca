@@ -6,14 +6,16 @@ import Cookies from 'js-cookie'
 import iiii from './YMCA-Logo-2010.png'
 const Enroll = () =>{
   const navigate = useNavigate();
-  const [schedules, setSchedules] = useState([])
 
+  //This is for the user's currently enrolled classes
+  const [schedules, setSchedules] = useState([])
   const [query, setQuery] = useState('');
   const [state, setstate] = useState({
     query: '',
     list: schedules
-});
+  });
 
+//Drops the specified class
 const DropClass = async (schedule_id, program_id, capac) =>{
     if(JSON.parse(Cookies.get('user_id')).family != null){
         //family
@@ -27,12 +29,14 @@ const DropClass = async (schedule_id, program_id, capac) =>{
     window.location.href = '/Enroll'
   }
 
+  //Drops all classes that conflict with the class the user is currently trying to enroll in.
   const dropConflicts = () =>{
     for(let i=0; i<state.list.length; i++){
       DropClass(state.list[i].schedule_id,state.list[i].program_id,parseInt(state.list[i].current_enrollment));
     }
   }
 
+  //This goes through the user's currently enrolled in programs, and returns any that conflict with the program they're currently enrolling in.
 const filtLoad = () =>{
   function dsf(value){
     if(value.start_time>=JSON.parse(Cookies.get("program")).start_time && value.end_time<=JSON.parse(Cookies.get("program")).start_time && value.day_of_week==JSON.parse(Cookies.get("program")).day_of_week){//starts in the middle of another class
@@ -53,7 +57,7 @@ const results = schedules.filter(dsf);
   state.list=results;
 }
 
-
+//This is the function that actually enrolls the user in a class
 async function handleClick(e, schedule_id){
   console.log("Error reporting soft");
     try{
@@ -73,8 +77,6 @@ async function handleClick(e, schedule_id){
               tookany = true;
             }
           }
-
-          //console.log(didtheytakeit.data);
           if(tookany){
             //took prereq, sign up
             console.log("took prereq, sign up");
@@ -83,12 +85,10 @@ async function handleClick(e, schedule_id){
             //did not take prereq
             console.log("didnt take prereq");
             alert("User has not passed pike level for this class!");
-            //navigate("/about/");
             return;
           }
         }
 
-        //console.log({user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e});
         //!!IMPORTANT!! If the conflicting class is the same as the one being enrolled in, then when the user drops the class, THE COOKIE DATA IS NOT UPDATED. That's why re-enrolling in the class increases the previous enrollment by 1, rather than
         //keeping it constant.
         const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:parseInt(JSON.parse(Cookies.get("program")).current_enrollment)+1, program_id: JSON.parse(Cookies.get("program")).id});
@@ -97,19 +97,15 @@ async function handleClick(e, schedule_id){
 
         }else{
           const result = await axios.post("http://localhost:8802/enrollment2", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id, family_member_id: Cookies.get('family_id')});
-          //alert(Cookies.get('family_id'));
           console.log(result);
         }
-        //console.log(e + result)
-        //navigate("/");
-
       }catch(err){
         console.log(err);
       }
       navigate('/');
 }
 
-
+//Gets user's currently enrolled classes
 useEffect(() => {
     const fetchAllSchedules = async ()=>{
       try{

@@ -14,6 +14,7 @@ import pic2 from './pic2.jpg'
 
 
 const Home = () => {
+  //When staff create a program, this is the data submitted the the database
   const [program, setProgram] = useState({
       description: "",
       max_capacity: 0,
@@ -25,17 +26,20 @@ const Home = () => {
       prereq_name: ""
 
     });
+    //These are the classes the user is enrolled in
+  const [schedule, setSchedules] = useState([]);
 
-  const [schedule, setSchedules] = useState([])
+  //these are the classes created by the user
   const [programss, setProgramss] = useState([]);
 
     const [query, setQuery] = useState('');
+    //Used for filtering programs and displaying them in the table/schedules
     const [state, setstate] = useState({
       query: '',
       list: schedule,
       list2: programss
     });
-
+    //The user's variables
   const [user, setUser] = useState({
       email: "",
       username: "",
@@ -50,11 +54,9 @@ const Home = () => {
 
 
   const navigate = useNavigate();
-
+  //I don't actually know, I guess this is for login stuff?
   const handleChange = (e) =>{
-    //alert(e.target.name);
     if(e.target.name == 'staff'){
-      //alert(e.target.checked);
       if(e.target.checked){
         setUser(prev=>({...prev, ['private']: 1}))
         document.getElementById('admin').checked = false;
@@ -77,26 +79,29 @@ const Home = () => {
     }
 
 }
-
+//Probably updates some variables related to program creation?
 const handleChange2 = (e) =>{
     setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
   }
 
-//!!Adds new user
+//!! Login page functions{
+
+//Adds new user/creates new account
 const handleClickAdd = async e =>{
   e.preventDefault();
   try{
     const result = await axios.post("http://localhost:8802/search", user);
     if(result.data.length == 0){
+      //account doesn't exist, create now
       console.log("null response");
       await axios.post("http://localhost:8802/users", user);
       const result2 = await axios.post("http://localhost:8802/search", user);
       document.cookie = "user_id=" + JSON.stringify(result2.data[0]) + "; path=/;";
       document.cookie = "new_family_name=" + result2.data[0].first_name + "; path=/;";
-      //didnt exist just created
+
       navigate("/");
     }else{
-      //already exists
+      //account already exists
       console.log(result.data);
       const email_field = document.getElementById("email");
       const username_field = document.getElementById('username');
@@ -107,15 +112,13 @@ const handleClickAdd = async e =>{
       }else if(result.data[0].username == username_field.value){
         document.getElementById("redtext100").innerHTML = "Username already in use!";
       }
-      //navigate("/add");
     }
-
-
   }catch(err){
     console.log(err);
   }
 }
-//!!Logs an existing user in
+
+//Logs an existing user in
 const handleClickLogin = async e =>{
   e.preventDefault();
   try{
@@ -140,8 +143,10 @@ const handleClickLogin = async e =>{
     console.log(err);
   }
 }
+//}!! End login page
+//!! UserDashboard {
 
-//UserDashboard
+//Changes the active family member (which family member's schedule to show, and who's currently enrolling for classes)
 async function changeFamilyMember(e, newName){
   document.cookie = "family_id=" + e + "; path=/;";
   document.cookie = "new_family_name=" + newName + "; path=/;";
@@ -151,6 +156,7 @@ async function changeFamilyMember(e, newName){
   navigate("/");
 }
 
+//Debug functions for upgrading to a member account.
 async function UpgradeMember(){
   const res = await axios.post("http://localhost:8802/upgradeToMember", {upgrade_id: JSON.parse(Cookies.get('user_id')).id});
     var x = JSON.parse(Cookies.get('user_id'));
@@ -158,7 +164,7 @@ async function UpgradeMember(){
   document.cookie = "user_id=" + JSON.stringify(x) + "; path=/;";
   navigate("/");
 }
-
+//Debug downgrade
 async function DowngradeMember(){
   const res = await axios.post("http://localhost:8802/upgradeToMember", {upgrade_id: JSON.parse(Cookies.get('user_id')).id});
     var x = JSON.parse(Cookies.get('user_id'));
@@ -167,8 +173,7 @@ async function DowngradeMember(){
   navigate("/");
 }
 
-
-
+//Turns a normal user account into a family account
 async function MakeFamily(){
   const res = await axios.post("http://localhost:8802/upgradeToFamily", {upgrade_id: JSON.parse(Cookies.get('user_id')).id});
     var x = JSON.parse(Cookies.get('user_id'));
@@ -176,7 +181,7 @@ async function MakeFamily(){
   document.cookie = "user_id=" + JSON.stringify(x) + "; path=/;";
   navigate("/");
 }
-
+//Creates/adds a new family member to an account
 async function AddMember(){
   if(document.getElementById("fname").value==''){
     document.getElementById("redtextfam").innerHTML="Enter the family member's name!";
@@ -192,12 +197,13 @@ async function AddMember(){
   }
 }
 
+//The list of family members
 const [familyMem, setfamilyMem] = useState([])
 
   useEffect(() => {
       const fetchAllfamilyMems = async ()=>{
         try{
-          /*while(!document.cookie){
+          /*while(!document.cookie){ //This is meant to combat the page loading before all data has been loaded
             var uuuu=4;
           }*/
             const res = await axios.post("http://localhost:8802/families", {user_id: JSON.parse(Cookies.get('user_id')).id});
@@ -209,12 +215,12 @@ const [familyMem, setfamilyMem] = useState([])
       fetchAllfamilyMems()
     }, [])
 
-
+//???
 async function RegRedirect(e){
   navigate("/Registrations/");
 }
 
-//Private user
+//Handles searches for staff/private users only
 const handleQuery = () =>{
 
   setQuery(document.getElementById('searchname').value);
@@ -253,17 +259,16 @@ const handleQuery = () =>{
     list: schedule,
     list2:results
   });
-  //alert(state.query);
 }
 
 
 
-
+//Gets the programs data for currently enrolled programs, as well as the programs created by the user
 useEffect(() => {
     const fetchAllSchedules = async ()=>{
       try{
             if(JSON.parse(Cookies.get('user_id')).family != null){
-                    //family
+                    //is a family
                     const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
                     setSchedules(res.data)
                     setProgramss(res.data)
@@ -285,9 +290,7 @@ useEffect(() => {
                   console.log(JSON.parse(Cookies.get('user_id')).id);
                   return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                 });
-
             }
-
       }catch(err){
           console.log(err)
       }
@@ -300,24 +303,23 @@ useEffect(() => {
     window.location.href = '/'
   }
 
+  //Drops a program
   const DropClass = async (schedule_id, program_id, capac) =>{
       if(JSON.parse(Cookies.get('user_id')).family != null){
           //family
           const res = await axios.post("http://localhost:8802/droppersonalclassfamily", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id')) });
-
       }else{
           //not a family
           const res = await axios.post("http://localhost:8802/droppersonalclass", {schedule_id: schedule_id, user_id: JSON.parse(Cookies.get('user_id')).id });
       }
-        const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:capac-1, program_id: program_id});
+      const fff=await axios.post("http://localhost:8802/increaseSeats",{enrol:capac-1, program_id: program_id});
       window.location.href = '/'
     }
 
 
 
-
+//Used for "collapsible" divs.
  const coooolll=()=>{
-
   var coll = document.getElementsByClassName("collap");
     var i;
 
@@ -333,13 +335,12 @@ useEffect(() => {
     }
   }
 
+    //The function that officially creates new programs
     const handleClickNex = async e =>{
       e.preventDefault();
-
       try{
-          //alert(JSON.parse(Cookies.get('user_id')).id);
           const assd=document.getElementsByClassName("redtext");
-          for(let i=0; i<assd.length; i++){
+          for(let i=0; i<assd.length; i++){//Resets all error messages related to program creation
             assd[i].innerHTML = "";
           }
           document.getElementById("success").innerHTML="";
@@ -347,7 +348,7 @@ useEffect(() => {
           var date = new Date(q.getFullYear(),q.getMonth(),q.getDate());
           var starDate = new Date(document.getElementById('start').value);
           var endDate = new Date(document.getElementById('end').value);
-          if(document.getElementById("name").value == ""){
+          if(document.getElementById("name").value == ""){//Error checking and throwing
             document.getElementById("redtext1").innerHTML = "Must enter program name!";
           } if(document.getElementById("description").value == ""){
             document.getElementById("redtext2").innerHTML = "Must enter description name!";
@@ -393,20 +394,17 @@ useEffect(() => {
             document.getElementById("redtextweek").innerHTML = "Must enter days!";
           }
 
-          var numInvalids=0;
+          var numInvalids=0;//if any errors have been thrown, they will be caught here, and the function stopped
           for(let i=0; i<assd.length; i++){
             if(assd[i].innerHTML!=""){
               numInvalids+=1
             }
           }
-           if(numInvalids==0){
+           if(numInvalids==0){//Else, continue with program creation
              document.getElementById("success").innerHTML="Program successfully created! Check \"created programs\"!"
-            if(document.getElementById("prerequisite").checked){
-
+            if(document.getElementById("prerequisite").checked){//If program has prereq
               const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
-
               if(prereq_id.data.length != 0){
-
 
                 const weekarray=document.getElementsByClassName("weekday");
                 for(let i=0; i<weekarray.length; i++){
@@ -431,11 +429,11 @@ useEffect(() => {
                     return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                   });
                   const resest=document.getElementsByTagName("input");
-                  var fasas=0
+                  var fasas=0//There's a glitch where if the input feilds are cleared too soon, the database update fails. This loop prevents that
                   while((res2.data.length==[] && fasas<100)){
                     fasas=fasas+1;
                   }
-                  for(let i=0; i<resest.length; i++){
+                  for(let i=0; i<resest.length; i++){//Resets all program creation feilds
                     if(resest[i].type!="checkbox"){
                       resest[i].value="";
                     }
@@ -446,7 +444,6 @@ useEffect(() => {
                 navigate("/");
 
               }else{
-                //{document.getElementById('start_time').valueAsDate = new Date()}
                 alert("Prerequisite class does not exist!  (Name must match previous class name)");
               }
             }else{
@@ -475,11 +472,11 @@ useEffect(() => {
                  return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
                });
                const resest=document.getElementsByTagName("input");
-               var fasas=0
+               var fasas=0//There's a glitch where if the input feilds are cleared too soon, the database update fails. This loop prevents that
                while((res2.data.length==[] && fasas<100)){
                  fasas=fasas+1;
                }
-               for(let i=0; i<resest.length; i++){
+               for(let i=0; i<resest.length; i++){//Resets all program creation feilds
                  if(resest[i].type!="checkbox"){
                    resest[i].value="";
                  }
@@ -490,16 +487,12 @@ useEffect(() => {
               navigate("/");
               console.log("Reloaded1");
             }
-            //document.getElementById("redtext").innerHTML = "";
-
-
-
           }
       }catch(err){
           console.log(err);
       }
     }
-
+//} !! end Dashboard
   return (
     <div>
         <header>
@@ -625,7 +618,7 @@ useEffect(() => {
                     <button onClick={()=> coooolll()} class="collap" >Created classes</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Classes created by this user div*/}
                     <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
-                      <div >
+                      <div>
                         <table class='table'>
                           <thead bgcolor='purple'>
 
@@ -740,7 +733,7 @@ useEffect(() => {
                             <button class="btn btn-secondary btn-lg" id={0} onClick={() => MakeFamily()}>Convert to family account</button>
                           </div>
                           <div style={{ marginRight:"20vw", width:"30vw", float:"right"}}>
-                            {/*this is empty intentionally. Just meant to show where memer switching will be*/}
+                            {/*this is empty intentionally. Just meant to show where member switching will be*/}
                           </div>
                         </div>
                       )
