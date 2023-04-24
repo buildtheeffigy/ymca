@@ -335,6 +335,12 @@ useEffect(() => {
     }
   }
 
+  const warnner=()=>{
+    for(let i=0; i<state.list.length; i++){
+
+    }
+  }
+
     //The function that officially creates new programs
     const handleClickNex = async e =>{
       e.preventDefault();
@@ -493,6 +499,8 @@ useEffect(() => {
       }
     }
 //} !! end Dashboard
+
+
   return (
     <div>
         <header>
@@ -532,6 +540,12 @@ useEffect(() => {
                 document.cookie ? (JSON.parse(Cookies.get('user_id')).private == 1 ?
                 (//Staff view
                   <div>
+                  <div id="notifications" style={{display:"none", width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightyellow", paddingTop:"1px"}}>{/*notifications divs*/}
+                  !!NOTICE!! The following classes have been canceled:
+                  {state.list.map(schedule=>(
+                    schedule.canceled==1 ? <div>{schedule.name}, {schedule.day_of_week}, {schedule.start_time} - {schedule.end_time}, {schedule.start_date.toString().split('T')[0]} - {schedule.end_date.toString().split('T')[0]}<span style={{display:"none"}}>{document.getElementById("notifications").style.display="block"}</span></div>:<span></span>
+                  ))}
+                  </div>
                     <button onClick={()=> coooolll()} class="collap" >Create NEW class</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*New programs div*/}
                     <div className='form'>
@@ -685,15 +699,20 @@ useEffect(() => {
                           </tr>
                           {state.list.map(schedule=>(
                             <tr key={schedule.id}>
-                            {console.log(schedule.id)}
-                            {console.log(schedule)}
-                              <td>{schedule.name}</td>
-                              <td>{schedule.description}</td>
-                              <td>{schedule.day_of_week}</td>
-                              <td>{schedule.start_time}  {schedule.end_time}</td>
-                              <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
-                              {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
-                              <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id, schedule.program_id, schedule.current_enrollment)}>Drop Class!</button></td>
+                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.name}</td>:<td>{schedule.name}</td>}
+                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.description}</td>:
+                            <td>{schedule.description}</td>}
+
+                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.day_of_week}</td>:
+                            <td>{schedule.day_of_week}</td>}
+
+                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.start_time}  {schedule.end_time}</td>:
+                            <td>{schedule.start_time}  {schedule.end_time}</td>}
+
+                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>:
+                            <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>}
+                            {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
+                            <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id, schedule.program_id, schedule.current_enrollment)}>Drop Class!</button></td>
                             </tr>
                           ))}
                     </table>
@@ -705,6 +724,12 @@ useEffect(() => {
                 )
                 :(//Customer view
                   <div>
+                  <div id="notifications" style={{display:"none", width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightyellow", paddingTop:"1px"}}>{/*notifications divs*/}
+                  !!NOTICE!! The following classes have been canceled:
+                  {state.list.map(schedule=>(
+                    schedule.canceled==1 ? <div>{schedule.name}, {schedule.day_of_week}, {schedule.start_time} - {schedule.end_time}, {schedule.start_date.toString().split('T')[0]} - {schedule.end_date.toString().split('T')[0]}<span style={{display:"none"}}>{document.getElementById("notifications").style.display="block"}</span></div>:<span></span>
+                  ))}
+                  </div>
                     <button onClick={()=> coooolll()} class="collap" >Family</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*//Family account div*/}
                       {
@@ -778,14 +803,22 @@ useEffect(() => {
                           </tr>
                           {state.list.map(schedule=>(
                             <tr key={schedule.id}>
-                              <td>{schedule.name}</td>
-                              <td>{schedule.description}</td>
-                              <td>{schedule.day_of_week}</td>
-                              <td>{schedule.start_time}  {schedule.end_time}</td>
-                              <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
+                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.name}</td>:<td>{schedule.name}</td>}
+                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.description}</td>:
+                              <td>{schedule.description}</td>}
+
+                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.day_of_week}</td>:
+                              <td>{schedule.day_of_week}</td>}
+
+                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.start_time}  {schedule.end_time}</td>:
+                              <td>{schedule.start_time}  {schedule.end_time}</td>}
+
+                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>:
+                              <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>}
                               {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? (<td>${schedule.member_price}</td>):(<td>${schedule.base_price}</td>)}
                               <td><button style={{backgroundColor:"grey"}} id = {schedule.schedule_id} onClick={() => DropClass(schedule.schedule_id, schedule.program_id, schedule.current_enrollment)}>Drop Class!</button></td>
                             </tr>
+
                           ))}
                     </table>
                     </div>
