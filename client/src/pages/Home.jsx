@@ -98,8 +98,7 @@ const handleClickAdd = async e =>{
       const result2 = await axios.post("http://localhost:8802/search", user);
       document.cookie = "user_id=" + JSON.stringify(result2.data[0]) + "; path=/;";
       document.cookie = "new_family_name=" + result2.data[0].first_name + "; path=/;";
-
-      navigate("/");
+      JSON.parse(Cookies.get('user_id')).private==2 ? navigate("/AdminHome"):navigate("/");
     }else{
       //account already exists
       console.log(result.data);
@@ -134,7 +133,10 @@ const handleClickLogin = async e =>{
         document.cookie = "family_id=0; path=/;";
 
       }
-      navigate("/");
+      fetchAllSchedules();
+      const res = await axios.post("http://localhost:8802/families", {user_id: JSON.parse(Cookies.get('user_id')).id});
+      setfamilyMem(res.data)
+      JSON.parse(Cookies.get('user_id')).private==2 ? navigate("/AdminHome"):navigate("/");
     }else{
       document.getElementById("redtext200").innerHTML = "Password is incorrect!";
     }
@@ -264,37 +266,36 @@ const handleQuery = () =>{
 
 
 //Gets the programs data for currently enrolled programs, as well as the programs created by the user
-useEffect(() => {
-    const fetchAllSchedules = async ()=>{
-      try{
-            if(JSON.parse(Cookies.get('user_id')).family != null){
-                    //is a family
-                    const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
-                    setSchedules(res.data)
-                    setProgramss(res.data)
-                     state.list = res.data
-                     state.list2=res.data
-                     console.log("familiy");
-            }else{
-                //not a family
-                console.log("not a family");
-                const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
-                console.log(res2);
-                const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
-                console.log(res2);
+const fetchAllSchedules = async ()=>{
+  try{
+    console.log(JSON.parse(Cookies.get('user_id')).family);
+        if(JSON.parse(Cookies.get('user_id')).family != null){
+                //is a family
+                const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
                 setSchedules(res.data)
-                setProgramss(res2.data)
+                setProgramss(res.data)
+                 state.list = res.data
+                 state.list2=res.data
+                 console.log("familiy");
+        }else{
+            //not a family
+            console.log("not a family");
+            const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
+            const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
+            setSchedules(res.data)
+            setProgramss(res2.data)
 
-                state.list = res.data
-                state.list2 = res2.data.filter(post =>{
-                  console.log(JSON.parse(Cookies.get('user_id')).id);
-                  return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
-                });
-            }
-      }catch(err){
-          console.log(err)
-      }
-    }
+            state.list = res.data
+            state.list2 = res2.data.filter(post =>{
+              return post.teacher_id==JSON.parse(Cookies.get('user_id')).id;
+            });
+        }
+  }catch(err){
+      console.log(err)
+  }
+}
+
+useEffect(() => {
     fetchAllSchedules()
   }, [])
 
@@ -319,27 +320,21 @@ useEffect(() => {
 
 
 //Used for "collapsible" divs.
- const coooolll=()=>{
+ async function coooolll(inde){
+   try{
   var coll = document.getElementsByClassName("collap");
-    var i;
-
-    for (i = 0; i < coll.length; i++) {
-      coll[i].addEventListener("click", function() {
-        var content = this.nextElementSibling;
+        var content = coll[inde].nextElementSibling;
         if (content.style.display === "block") {
           content.style.display = "none";
         } else {
           content.style.display = "block";
         }
-      });
-    }
   }
-
-  const warnner=()=>{
-    for(let i=0; i<state.list.length; i++){
-
-    }
+  catch(err){
+    console.log(err);
   }
+}
+
 
     //The function that officially creates new programs
     const handleClickNex = async e =>{
@@ -546,7 +541,7 @@ useEffect(() => {
                     schedule.canceled==1 ? <div>{schedule.name}, {schedule.day_of_week}, {schedule.start_time} - {schedule.end_time}, {schedule.start_date.toString().split('T')[0]} - {schedule.end_date.toString().split('T')[0]}<span style={{display:"none"}}>{document.getElementById("notifications").style.display="block"}</span></div>:<span></span>
                   ))}
                   </div>
-                    <button onClick={()=> coooolll()} class="collap" >Create NEW class</button>
+                    <button onClick={()=> coooolll(0)} class="collap" >Create NEW class</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*New programs div*/}
                     <div className='form'>
                       <h1>Create Program!</h1>
@@ -629,7 +624,7 @@ useEffect(() => {
                     </div>
 
                     </div>
-                    <button onClick={()=> coooolll()} class="collap" >Created classes</button>
+                    <button onClick={()=> coooolll(1)} class="collap" >Created classes</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Classes created by this user div*/}
                     <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
                       <div>
@@ -684,7 +679,7 @@ useEffect(() => {
                     </table>
                     </div>
                     </div>
-                    <button onClick={()=> coooolll()} class="collap" >Schedule</button>
+                    <button onClick={()=> coooolll(2)} class="collap" >Schedule</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Personal schedule div*/}
                     <a href="/programs"><button>Add classes</button></a>
                       <div class='container'>
@@ -730,7 +725,7 @@ useEffect(() => {
                     schedule.canceled==1 ? <div>{schedule.name}, {schedule.day_of_week}, {schedule.start_time} - {schedule.end_time}, {schedule.start_date.toString().split('T')[0]} - {schedule.end_date.toString().split('T')[0]}<span style={{display:"none"}}>{document.getElementById("notifications").style.display="block"}</span></div>:<span></span>
                   ))}
                   </div>
-                    <button onClick={()=> coooolll()} class="collap" >Family</button>
+                    <button onClick={()=> coooolll(0)} class="collap" >Family</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*//Family account div*/}
                       {
                         document.cookie && JSON.parse(Cookies.get('user_id')).family != null
@@ -764,7 +759,7 @@ useEffect(() => {
                       )
                       }
                     </div>
-                    <button onClick={()=> coooolll()} class="collap" >Membership</button>
+                    <button onClick={()=> coooolll(1)} class="collap" >Membership</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*member account div*/}
                         {
                           document.cookie && JSON.parse(Cookies.get('user_id')).membership_status != 2
@@ -788,7 +783,7 @@ useEffect(() => {
                           </div>)
                         }
                     </div>
-                    <button onClick={()=> coooolll()} class="collap" >Schedule</button>
+                    <button onClick={()=> coooolll(2)} class="collap" >Schedule</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Personal schedule div*/}
                     <a href="/programs"><button>Add classes</button></a>
                       <div class='container'>
@@ -861,8 +856,6 @@ useEffect(() => {
                     </div>
                   </div>)
               }
-
-
     </div>
   )
 }

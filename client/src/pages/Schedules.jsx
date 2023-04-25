@@ -139,7 +139,9 @@ const Schedules = () => {
             <td></td>
             <td></td>
             </tr>
-          {state.list.map(schedule=>(
+
+            { state.list.length!=0 ? (
+          state.list.map(schedule=>(
               <tr key={schedule.id}>
                   <td>{schedule.name}</td>
                   <td>{schedule.day_of_week}</td>
@@ -153,7 +155,9 @@ const Schedules = () => {
                   }
 
               </tr>
-          ))}
+          )))
+          :<tr><td style={{background:"white"}}>No Results</td></tr>
+        }
 
           </tbody>
       </table>

@@ -60,6 +60,10 @@ const Users = () => {
         try{
             const res = await axios.get("http://localhost:8802/users");
             setUsers(res.data)
+            setstate({
+              query: document.getElementById('searchname').value,
+              list: res.data
+            })
         }catch(err){
             console.log(err)
         }
@@ -71,34 +75,38 @@ const Users = () => {
   return <div>
   <div>
   <header>
-      <div class="container">
-        <div class="row">
-          <div class="col-sm">
-          <a href="/"><img src={iiii} height='100px' style={{verticalAlign:"baseline"}}></img></a>
-          </div>
-          <div class="col-sm">
-          <a href="/programs/">Programs</a>
-          </div>
-          <div class="col-sm">
-          <a href="/about/">About</a>
-          </div>
-          <div class="col-sm">
-          {
-              document.cookie ? <a href='/'>Welcome, {Cookies.get('new_family_name')}</a> : <a href="/">Sign Up  or Log In!</a>
-          }
-          </div>
-          <div class="col-sm">
-          {
-              document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
-          }
-          </div>
-          <div class="col-sm">
-          {
-              document.cookie ? <a href="/DeleteAccount/">Delete Account</a> : <div></div>
-          }
-          </div>
+        <div class="container">
+              <div class="row">
+                  <div class="col-sm">
+                  <a href="/AdminHome"><img src={iiii} height='100px' style={{verticalAlign:"baseline"}}></img></a>
+                  </div>
+                  <div class="col-sm">
+                  <a href="/AdminProgram/">Programs</a>
+                  </div>
+                  <div class="col-sm">
+                  <a href="/EnrollmentSearch/">Enrollments</a>
+                  </div>
+                  <div class="col-sm">
+                  <a href="/about/">About</a>
+                  </div>
+                  <div class="col-sm">
+                  {
+                      document.cookie ? <a href='/AdminHome'>Welcome, {Cookies.get('new_family_name')}</a> : <a href="/AdminHome">Sign Up  or Log In!</a>
+                  }
+                  </div>
+                  <div class="col-sm">
+                  {
+                      document.cookie ? <a href="/Users/">Users</a> : <div></div>
+                  }
+                  </div>
+                  <div class="col-sm">
+                  {
+                      document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
+                  }
+                  </div>
+
+              </div>
         </div>
-      </div>
   </header>
   </div>
 

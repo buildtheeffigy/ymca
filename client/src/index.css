@@ -32,7 +32,10 @@ input{
 }
 
 .collap{
-  width:100%;
+  width:100vw;
+}
+.s{
+  width:100vw;
 }
 
 .cont{
