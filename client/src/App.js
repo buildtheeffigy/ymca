@@ -19,7 +19,6 @@ import DeleteAccount from "./pages/DeleteAccount";
 import Enroll from "./pages/Enroll";
 import HardDelete from "./pages/HardDelete";
 import AdminProgram from "./pages/AdminProgram";
-import EnrollSearch from "./pages/EnrollmentSearch";
 import AdminHome from "./pages/AdminHome";
 
 function App() {
@@ -38,7 +37,6 @@ function App() {
         <Route path="/DeleteAccount" element={<DeleteAccount/>}/>
         <Route path="/HardDelete" element={<HardDelete/>}/>
         <Route path="/AdminHome" element={<AdminHome/>}/>
-        <Route path="/EnrollmentSearch" element={<EnrollSearch/>}/>
         <Route path="/AdminProgram" element={<AdminProgram/>}/>
 
         </Routes>

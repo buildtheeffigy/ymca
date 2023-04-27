@@ -626,7 +626,6 @@ useEffect(() => {
                     </div>
                     <button onClick={()=> coooolll(1)} class="collap" >Created classes</button>
                     <div class="cont" style={{width:"100vw", marginLeft:"0vw", marginRight:"0vw", background:"lightcyan", paddingTop:"1px"}}>{/*Classes created by this user div*/}
-                    <button class="btn btn-secondary btn-lg" onClick={() => RegRedirect()}>Registrations</button>
                       <div>
                         <table class='table'>
                           <thead bgcolor='purple'>
@@ -749,7 +748,7 @@ useEffect(() => {
                         :
                         (<div>
                           {/*solo account view*/}
-                          <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
+                          <div style={{ marginLeft:"20vw", width:"20vw", marginTop:"10vh",paddingBottom:"5%"}}>
                             <button class="btn btn-secondary btn-lg" id={0} onClick={() => MakeFamily()}>Convert to family account</button>
                           </div>
                           <div style={{ marginRight:"20vw", width:"30vw", float:"right"}}>
@@ -768,7 +767,7 @@ useEffect(() => {
                             <div style={{ marginLeft:"20vw", width:"20vw", float:"left", marginTop:"10vh"}}>
                               <button class="btn btn-secondary btn-lg" id={0} onClick={() => UpgradeMember()}>Upgrade to a YMCA Membership!</button>
                             </div>
-                            <div style={{padding:"50px", width:"50%", float:"right"}}>
+                            <div style={{padding:"30px", width:"50%", float:"right"}}>
                               <h1 class="display-1">Currently NOT YMCA Member!</h1>
                             </div>
                           </div>)

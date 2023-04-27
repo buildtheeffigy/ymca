@@ -187,15 +187,16 @@ return(
               <td>{schedule.start_time}  {schedule.end_time}</td>
               <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
               {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
-              <td>{schedule.current_enrollment} {schedule.max_capacity}</td>
+              <td>{schedule.current_enrollment}/{schedule.max_capacity}</td>
             </tr>
           ))}
 
           </tbody>
       </table>
-    ):(<div>All good <button onClick={()=> handleClick(JSON.parse(Cookies.get("program")).id, JSON.parse(Cookies.get("program")).schedule_id)}>Confirm enrollment</button><a href="/programs"><button>Cancel enrollment</button></a></div>)}
-      {state.list[0]!=null ? (<div><button onClick={()=> dropConflicts()}>Drop conflicts</button>
-        <a href="/programs"><button>Cancel enrollment</button></a></div>):<div></div>}
+    ):(<div><div><h3 style={{margin:"5px"}}>All good!</h3></div><div> <button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}} onClick={()=> handleClick(JSON.parse(Cookies.get("program")).id, JSON.parse(Cookies.get("program")).schedule_id)}>Confirm enrollment</button>
+    <a href="/programs"><button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}}>Cancel enrollment</button></a></div></div>)}
+      {state.list[0]!=null ? (<div><button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}} onClick={()=> dropConflicts()}>Drop conflicts</button>
+        <a href="/programs"><button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}}>Cancel enrollment</button></a></div>):<div></div>}
 
   </div>
 </div>

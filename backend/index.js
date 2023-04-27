@@ -19,6 +19,7 @@ app.get("/", (req, res)=>{
     res.json("hello this is the backend!")
 })
 
+//Pulls all users, and all user's data
 app.get("/users", (req, res)=>{
     const query = "SELECT * FROM users"
 
@@ -28,17 +29,18 @@ app.get("/users", (req, res)=>{
     })
 })
 
-app.get("/programs", (req, res)=>{
+
+/*app.get("/programs", (req, res)=>{
     const query = "SELECT programs.id, description, canceled, max_capacity, programs.current_enrollment, base_price, member_price, name, first_name, last_name, email FROM programs INNER JOIN users ON users.id = programs.teacher_id;"
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
     })
-})
+})*/
 
+//Returns data on all programs, used for the program search pages
 app.get("/schedules", (req, res)=>{
-    //const query = "SELECT * FROM schedule INNER JOIN programs on program_id = programs.id;";
     const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', teacher_id, name, day_of_week, canceled, start_time, start_date, end_time, end_date, base_price, member_price, max_capacity, current_enrollment FROM schedule INNER JOIN programs on program_id = programs.id;";
 
     db.query(query, (err, data)=>{
@@ -47,10 +49,9 @@ app.get("/schedules", (req, res)=>{
     })
 })
 
+//Soft delete account
 app.post('/deleteaccount',(req, res)=>{
     const query = "UPDATE users SET deleted = 1 WHERE id = '" + req.body.user_id +  "'";
-
-    //const values = [req.body.course_id];
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
@@ -58,6 +59,7 @@ app.post('/deleteaccount',(req, res)=>{
     })
 })
 
+//hard delete account
 app.post('/harddelete', (req, res)=>{
     const query = "DELETE from users WHERE id = '" + req.body.user_id + "'";
 
@@ -67,6 +69,7 @@ app.post('/harddelete', (req, res)=>{
     })
 })
 
+//returns program/schedule data for all programs CREATED BY THIS SPECIFIC USER, that AREN'T CANCELED
 app.post('/staffschedule', (req, res)=>{
     const query = "SELECT teacher_id, program_id, start_time, canceled, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.schedule LEFT JOIN new_schema.programs on programs.id = program_id WHERE teacher_id="+req.body.teach_id+" AND canceled=0;";
     db.query(query, (err, data)=>{
@@ -75,6 +78,7 @@ app.post('/staffschedule', (req, res)=>{
     })
 })
 
+//returns all programs that the current user is enrolled in
 app.post('/personalschedule', (req, res)=>{
     const query = "SELECT schedule_id, program_id, start_time, canceled, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.enrollment LEFT JOIN new_schema.schedule on schedule.id = schedule_id LEFT JOIN new_schema.programs on programs.id = course_id WHERE user_id = '" + req.body.user_id + "';";
     db.query(query, (err, data)=>{
@@ -83,6 +87,7 @@ app.post('/personalschedule', (req, res)=>{
     })
 })
 
+//returns all programs that the current user is enrolled in, and takes family stuff into account
 app.post('/personalschedulefamily', (req, res)=>{
     const query = "SELECT schedule_id, program_id, start_time, canceled, end_time, day_of_week, start_date, end_date, description, name, max_capacity, current_enrollment, base_price, member_price FROM new_schema.enrollment LEFT JOIN new_schema.schedule on schedule.id = schedule_id LEFT JOIN new_schema.programs on programs.id = course_id WHERE user_id = '" + req.body.user_id + "' AND family_member_id = '" + req.body.family_member_id + "';";
     db.query(query, (err, data)=>{
@@ -91,6 +96,7 @@ app.post('/personalschedulefamily', (req, res)=>{
     })
 })
 
+//Drops a class
 app.post('/droppersonalclass', (req, res)=>{
     const query = "DELETE from enrollment WHERE schedule_id = '" + req.body.schedule_id + "' AND user_id = '" + req.body.user_id + "';";
 
@@ -100,6 +106,7 @@ app.post('/droppersonalclass', (req, res)=>{
     })
 })
 
+//Drops a family member's class
 app.post('/droppersonalclassfamily', (req, res)=>{
     const query = "DELETE from enrollment WHERE schedule_id = '" + req.body.schedule_id + "' AND user_id = '" + req.body.user_id + "' AND family_member_id = '"+ req.body.family_member_id +"';";
 
@@ -164,6 +171,7 @@ app.post('/enrollment2', (req, res)=>{
     })
 })
 
+//Modifies the current enrollment counts for a program
 app.post('/increaseSeats', (req, res)=>{
       const query="UPDATE programs SET current_enrollment="+req.body.enrol+" WHERE id="+req.body.program_id+"";
 
@@ -301,8 +309,6 @@ app.post("/login", (req, res)=>{
 })
 
 app.post("/familymember", (req, res)=>{
-
-
     const q = "INSERT INTO families (user_id, name) VALUES (?)";
 
     const values = [
@@ -317,8 +323,6 @@ app.post("/familymember", (req, res)=>{
 })
 
 app.post("/users", (req, res)=>{
-
-
     const q = "INSERT INTO users (first_name, last_name, current_enrollment, password, membership_status, private, username, family, email) VALUES (?)";
 
     const values = [

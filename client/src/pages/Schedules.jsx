@@ -41,7 +41,19 @@ const Schedules = () => {
           return post
         }
         return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
-      });
+      }).filter(post => {
+      if(document.getElementById('capacityC').checked== false){
+        return post
+      }
+      return post.current_enrollment<post.max_capacity
+    }).filter(post => {
+    if(document.getElementById('canceledC').checked== false){
+      return post
+    }
+    return post.canceled==0
+  });
+
+
       setstate({
         query: document.getElementById('searchname').value,
         list: results
@@ -136,8 +148,14 @@ const Schedules = () => {
             <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
             <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input class="SearchFeild" type="date" id="searchDate" name="StartDate" placeholder='Name' onChange={handleQuery}/></td>
             <td><label for="searchprice" style={{fontSize:"20px"}}>Search by</label><input class="SearchFeild" type="search" id='searchprice' name='costs' placeholder='Maximum price' onChange={handleQuery}/></td>
-            <td></td>
-            <td></td>
+            <td>
+            <label for="capacityC" style={{fontSize:"20px"}}>Exclude Filled Classes</label>
+            <input type="checkbox" name="staff" id='capacityC' onChange={handleQuery}/>
+            </td>
+            <td>
+            <label for="canceledC" style={{fontSize:"20px"}}>Exclude Canceled Classes</label>
+            <input type="checkbox" name="staff" id='canceledC' onChange={handleQuery}/>
+            </td>
             </tr>
 
             { state.list.length!=0 ? (

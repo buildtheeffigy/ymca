@@ -36,15 +36,24 @@ const Users = () => {
             }
           }
           return post;
-        }). filter(post =>{
-          if(document.getElementById('privSearch').checked == true){
-            if(document.getElementById('privStatus').checked == true){
-              return post.private==1;
-            }else{
-              return post.private==0;
-            }
+        }).filter(post =>{
+          if(document.getElementById('privSearch').value.toLowerCase() == 'null'){
+            return post
           }
-          return post;
+          var ds=0;
+          if(document.getElementById('privSearch').value=='public'){
+            ds=0;
+            console.log(ds);
+          }
+          if(document.getElementById('privSearch').value=="staff"){
+            ds=1;
+            console.log(ds);
+          }
+          if(document.getElementById('privSearch').value=="admin"){
+            ds=2;
+            console.log(ds);
+          }
+          return post.private==ds;
         }).filter(post =>{
           if(document.getElementById('searchEmail').value == "") return post
           return post.email.includes(document.getElementById('searchEmail').value);
@@ -55,6 +64,12 @@ const Users = () => {
       });
     }
 
+    const handleHardDelete = async (id) =>{
+      const res = await axios.post("http://localhost:8802/harddelete", {user_id: id});
+      window.location.href = '/HardDelete'
+    }
+
+
     useEffect(() => {
       const fetchAllUsers = async ()=>{
         try{
@@ -64,6 +79,8 @@ const Users = () => {
               query: document.getElementById('searchname').value,
               list: res.data
             })
+            console.log(res.data);
+            console.log("jjjjjjjjjjj");
         }catch(err){
             console.log(err)
         }
@@ -122,6 +139,7 @@ const Users = () => {
         <th>Private</th>
         <th>Family</th>
         <th>Email</th>
+        <th>DELETE</th>
         </thead>
         <tr>
         <td>
@@ -138,22 +156,26 @@ const Users = () => {
         </td>
         <td> ??? </td>
         <td>
-          <label for="memSearch" style={{fontSize:"20px"}}>Search by member status:</label>
+          <label for="memSearch" style={{fontSize:"15px"}}>Search by member status:</label>
           <input type="checkbox" id="memSearch" onChange={handleQuery}/>
-          <label for="memStatus" style={{fontSize:"20px"}}>Member vs. Non-member:</label>
+          <label for="memStatus" style={{fontSize:"15px"}}>Filter Non-members:</label>
           <input type="checkbox" id="memStatus" onChange={handleQuery}/>
         </td>
         <td>
-          <label for="privSearch" style={{fontSize:"20px"}}>Search by account status:</label>
-          <input type="checkbox" id="privSearch" onChange={handleQuery}/>
-          <label for="privStatus" style={{fontSize:"20px"}}>Public vs. Private:</label>
-          <input type="checkbox" id="privStatus" onChange={handleQuery}/>
+        <label for="privSearch" style={{fontSize:"20px"}}>Search by:</label>
+        <select name="week" id="privSearch" onChange={handleQuery}>
+          <option value="null">User type</option>
+          <option value="public">Public</option>
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
         </td>
         <td>???</td>
         <td>
           <label for="searchEmail" style={{fontSize:"20px"}}>Search by</label>
           <input class="SearchFeild" type="search" id='searchEmail' name='name' placeholder='Email' onChange={handleQuery}/>
         </td>
+        <td></td>
 
         </tr>
         {state.list.map(user=>(
@@ -166,6 +188,7 @@ const Users = () => {
                 <td>{user.private}</td>
                 <td>{user.family}</td>
                 <td>{user.email}</td>
+                <td><button id={user.id} onClick={() => (handleHardDelete(user.id))}>HARD DELETE</button></td>
 
             </tr>
         ))}

@@ -16,7 +16,7 @@ const AdminHome =()=>{
                     <a href="/AdminProgram/">Programs</a>
                     </div>
                     <div class="col-sm">
-                    <a href="/EnrollmentSearch/">Enrollments</a>
+                    <a href="/Registrations/">Registrations</a>
                     </div>
                     <div class="col-sm">
                     <a href="/about/">About</a>
