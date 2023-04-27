@@ -161,13 +161,14 @@ const Schedules = () => {
             { state.list.length!=0 ? (
           state.list.map(schedule=>(
               <tr key={schedule.id}>
-                  <td>{schedule.name}</td>
-                  <td>{schedule.day_of_week}</td>
-                  <td>{schedule.start_time}  {schedule.end_time}</td>
-                  <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
-                  {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
-                  <td>{schedule.current_enrollment}/{schedule.max_capacity}</td>
+                  <td>{schedule.canceled == 1 ? <s>{schedule.name}</s> : schedule.name}</td>
+                  <td>{schedule.canceled == 1 ? <s>{schedule.day_of_week}</s> : schedule.day_of_week}</td>
+                  <td>{schedule.canceled == 1 ? <s>{schedule.start_time}</s> : schedule.start_time }     {schedule.canceled == 1 ? <s>{schedule.end_time}</s> : schedule.end_time}</td>
+                  <td>{schedule.canceled == 1 ? <s>{schedule.start_date.toString().split('T')[0]}</s> : schedule.start_date.toString().split('T')[0]}  {schedule.canceled == 1 ? <s>{schedule.end_date.toString().split('T')[0]}</s> : schedule.end_date.toString().split('T')[0]}</td>
+                  {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.canceled == 1 ? <s>{schedule.member_price}</s> : schedule.member_price}</td>:<td>${schedule.canceled == 1 ? <s>{schedule.base_price}</s> : schedule.base_price}</td>}
+                  <td>{schedule.canceled == 1  ? <s>{schedule.current_enrollment}</s> : schedule.current_enrollment}/{schedule.canceled == 1 ? <s>{schedule.max_capacity}</s> : schedule.max_capacity}</td>
                   {
+                    schedule.canceled == 1 ? <td class='redtext'>Cancelled!</td> :  
                     /*This button creates a cookie containing the data for the program the user is trying to enroll in, before sending the user to the enroll page*/
                     (document.cookie && schedule.current_enrollment<schedule.max_capacity) ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
                   }

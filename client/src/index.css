@@ -107,3 +107,7 @@ tr:nth-child(even) {
   width:auto;
   margin:auto;
 }
+
+s{
+  text-decoration: red line-through;
+}
