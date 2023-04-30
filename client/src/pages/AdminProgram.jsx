@@ -40,7 +40,7 @@ const AdminProgram=()=>{
       if(document.getElementById('week').value.toLowerCase() == 'day'){
         return post
       }
-      return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+      return post.day_of_week.toLowerCase().includes(document.getElementById('week').value.toLowerCase());
     });
     setstate({
       query: document.getElementById('searchname').value,
@@ -125,13 +125,13 @@ const AdminProgram=()=>{
           <label for="week" style={{fontSize:"20px"}}>Search by</label>
           <select name="week" id="week" onChange={handleQuery}>
             <option value="day">Weekday</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+            <option value="7">Sunday</option>
           </select>
           </td>
           <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
@@ -145,7 +145,13 @@ const AdminProgram=()=>{
         state.list.map(schedule=>(
             <tr key={schedule.id}>
                 <td>{schedule.name}</td>
-                <td>{schedule.day_of_week}</td>
+                <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>
                 <td>{schedule.start_time}  {schedule.end_time}</td>
                 <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
                 <td>${schedule.base_price}/${schedule.member_price}</td>

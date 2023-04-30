@@ -30,6 +30,10 @@ input{
   border-radius: 10px;
 }
 
+input:not([type='checkbox']){
+  width:250px;
+}
+
 .collap{
   width:100vw;
 }
@@ -101,6 +105,12 @@ tr:nth-child(even) {
   width: 50%;
   display:flex;
   margin:auto;
+}
+
+.weekday{
+  width:200px;
+  margin-left:15px;
+  margin-right:-10px;
 }
 
 #redtextweek{

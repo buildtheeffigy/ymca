@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `new_schema`.`schedule` (
   `program_id` INT NOT NULL,
   `start_time` TIME NOT NULL,
   `end_time` TIME NOT NULL,
-  `day_of_week` ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+  `day_of_week` VARCHAR(7) NOT NULL,
   `start_date` DATE NOT NULL,
   `end_date` DATE NOT NULL,
   PRIMARY KEY (`id`),

@@ -237,7 +237,7 @@ const handleQuery = () =>{
     if(document.getElementById('week').value.toLowerCase() == 'day'){
       return post
     }
-    return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+    return post.day_of_week.toLowerCase().includes(document.getElementById('week').value.toLowerCase());
   }) .filter(post=>{
     if(document.getElementById('searchTime').value == ""){
       return post
@@ -403,25 +403,46 @@ useEffect(() => {
           }
            if(numInvalids==0){//Else, continue with program creation
              document.getElementById("success").innerHTML="Program successfully created! Check \"created programs\"!"
+
+             let day_time=0;//this is the 'encoded' days of the week.
+             if(document.getElementById("Monday").checked == true){
+               day_time+=1000000;
+             }
+             if(document.getElementById("Tuesday").checked == true){
+               day_time+=200000;
+             }
+             if(document.getElementById("Wednesday").checked == true){
+               day_time+=30000;
+             }
+             if(document.getElementById("Thursday").checked == true){
+               day_time+=4000;
+             }
+             if(document.getElementById("Friday").checked == true){
+               day_time+=500;
+             }
+             if(document.getElementById("Saturday").checked == true){
+               day_time+=60;
+             }
+             if(document.getElementById("Sunday").checked == true){
+               day_time+=7;
+             }
+
             if(document.getElementById("prerequisite").checked){//If program has prereq
               const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
               if(prereq_id.data.length != 0){
 
-                const weekarray=document.getElementsByClassName("weekday");
-                for(let i=0; i<weekarray.length; i++){
-                   if(weekarray[i].checked){
                     const result = await axios.post("http://localhost:8802/createprogram2", program); // prereq
                     const result2 = await axios.post("http://localhost:8802/scheduletable",
                     {program_id: result.data.insertId,
                     start_time: document.getElementById("start_time").value,
                     end_time: document.getElementById("end_time").value,
-                    day_of_week: weekarray[i].value,
+                    day_of_week: day_time.toString(),
                     start_date: document.getElementById("start").value,
                     end_date: document.getElementById("end").value}); // insert into schedules
                     console.log(result);
                     console.log(result2);
-                   }
-                  }
+
+
 
                   const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                   const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
@@ -442,29 +463,24 @@ useEffect(() => {
                       resest[i].checked=false;
                     }
                   }
-                navigate("/");
+                //navigate("/");
 
               }else{
                 alert("Prerequisite class does not exist!  (Name must match previous class name)");
               }
             }else{
 
-
-              const weekarray=document.getElementsByClassName("weekday");
-             for(let i=0; i<weekarray.length; i++){
-                if(weekarray[i].checked){
                   const result = await axios.post("http://localhost:8802/createprogram", program);
                   const result2 = await axios.post("http://localhost:8802/scheduletable",
                                       {program_id: result.data.insertId,
                                       start_time: document.getElementById("start_time").value,
                                       end_time: document.getElementById("end_time").value,
-                                      day_of_week: weekarray[i].value,
+                                      day_of_week: day_time.toString(),
                                       start_date: document.getElementById("start").value,
                                       end_date: document.getElementById("end").value}); // insert into schedules
                                       console.log(result);
                                       console.log(result2);
-                }
-               }
+
                const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
                state.list = res.data
@@ -485,7 +501,7 @@ useEffect(() => {
                    resest[i].checked=false;
                  }
                }
-              navigate("/");
+              //navigate("/");
               console.log("Reloaded1");
             }
           }
@@ -664,7 +680,13 @@ useEffect(() => {
                         {state.list2.map( programss=>(
                             <tr key={programss.id}>
                                 <td>{programss.name}</td>
-                                <td>{programss.day_of_week}</td>
+                                <td>{programss.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                                {programss.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                                {programss.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                                {programss.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                                {programss.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                                {programss.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                                {programss.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>
                                 <td>{programss.start_time}  {programss.end_time}</td>
                                 <td>{programss.start_date.toString().split('T')[0]}  {programss.end_date.toString().split('T')[0]}</td>
                                 {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${programss.member_price}</td>:<td>${programss.base_price}</td>}
@@ -697,8 +719,20 @@ useEffect(() => {
                             {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.description}</td>:
                             <td>{schedule.description}</td>}
 
-                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.day_of_week}</td>:
-                            <td>{schedule.day_of_week}</td>}
+                            {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                            {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                            {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                            {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                            {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                            {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                            {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>:
+                            <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                            {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                            {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                            {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                            {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                            {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                            {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>}
 
                             {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.start_time}  {schedule.end_time}</td>:
                             <td>{schedule.start_time}  {schedule.end_time}</td>}
@@ -801,8 +835,20 @@ useEffect(() => {
                               {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.description}</td>:
                               <td>{schedule.description}</td>}
 
-                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.day_of_week}</td>:
-                              <td>{schedule.day_of_week}</td>}
+                              {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                              {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                              {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                              {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                              {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                              {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                              {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>:
+                              <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                              {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                              {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                              {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                              {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                              {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                              {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>}
 
                               {schedule.canceled==1 ? <td style={{textDecoration:"red line-through"}}>{schedule.start_time}  {schedule.end_time}</td>:
                               <td>{schedule.start_time}  {schedule.end_time}</td>}

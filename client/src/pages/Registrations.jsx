@@ -37,7 +37,7 @@ const Registrations = () => {
           if(document.getElementById('week').value.toLowerCase() == 'day'){
             return post
           }
-          return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+          return post.day_of_week.toLowerCase.includes() == document.getElementById('week').value.toLowerCase();
         });
         setstate({
           query: document.getElementById('searchnameF').value,
@@ -130,13 +130,13 @@ const Registrations = () => {
           <label for="week" style={{fontSize:"20px"}}>Search by</label>
           <select name="week" id="week" onChange={handleQuery}>
             <option value="day">Weekday</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-            <option value="Sunday">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+            <option value="7">Sunday</option>
           </select>
           </td>
           <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input class="SearchFeild" type="date" id="searchDate" name="StartDate" placeholder='Name' onChange={handleQuery}/></td>
@@ -151,7 +151,13 @@ const Registrations = () => {
                 }
                   <td>{programs.last_name}</td>
                   <td>{programs.name}</td>
-                  <td>{programs.day_of_week}</td>
+                  <td>{programs.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                  {programs.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                  {programs.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                  {programs.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                  {programs.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                  {programs.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                  {programs.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>
                   <td>{programs.start_date.toString().split('T')[0]} {programs.end_date.toString().split('T')[0]}</td>
                   <td>{programs.start_time} {programs.end_time}</td>
 

@@ -40,7 +40,7 @@ const Schedules = () => {
         if(document.getElementById('week').value.toLowerCase() == 'day'){
           return post
         }
-        return post.day_of_week.toLowerCase() == document.getElementById('week').value.toLowerCase();
+        return post.day_of_week.toLowerCase().includes(document.getElementById('week').value.toLowerCase());
       }).filter(post => {
       if(document.getElementById('capacityC').checked== false){
         return post
@@ -112,7 +112,7 @@ const Schedules = () => {
           </div>
       </header>
       </div>
-      <div style={{width:"80vw", marginLeft:"10vw", marginRight:"10vw"}}>
+      <div style={{width:"80vw", marginLeft:"2vw", marginRight:"2vw"}}>
       <table class='table'>
           <thead bgcolor='purple'>
 
@@ -136,13 +136,13 @@ const Schedules = () => {
             <label for="week" style={{fontSize:"20px"}}>Search by</label>
             <select name="week" id="week" onChange={handleQuery}>
               <option value="day">Weekday</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
+              <option value="1">Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+              <option value="7">Sunday</option>
             </select>
             </td>
             <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
@@ -162,13 +162,27 @@ const Schedules = () => {
           state.list.map(schedule=>(
               <tr key={schedule.id}>
                   <td>{schedule.canceled == 1 ? <s>{schedule.name}</s> : schedule.name}</td>
-                  <td>{schedule.canceled == 1 ? <s>{schedule.day_of_week}</s> : schedule.day_of_week}</td>
+                  <td>{schedule.canceled == 1 ? <s>
+                    {schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                    {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                    {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                    {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                    {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                    {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                    {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</s> :
+                    <div>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+                    {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+                    {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+                    {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+                    {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+                    {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+                    {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</div>}</td>
                   <td>{schedule.canceled == 1 ? <s>{schedule.start_time}</s> : schedule.start_time }     {schedule.canceled == 1 ? <s>{schedule.end_time}</s> : schedule.end_time}</td>
                   <td>{schedule.canceled == 1 ? <s>{schedule.start_date.toString().split('T')[0]}</s> : schedule.start_date.toString().split('T')[0]}  {schedule.canceled == 1 ? <s>{schedule.end_date.toString().split('T')[0]}</s> : schedule.end_date.toString().split('T')[0]}</td>
                   {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).membership_status == 2)) ? <td>${schedule.canceled == 1 ? <s>{schedule.member_price}</s> : schedule.member_price}</td>:<td>${schedule.canceled == 1 ? <s>{schedule.base_price}</s> : schedule.base_price}</td>}
                   <td>{schedule.canceled == 1  ? <s>{schedule.current_enrollment}</s> : schedule.current_enrollment}/{schedule.canceled == 1 ? <s>{schedule.max_capacity}</s> : schedule.max_capacity}</td>
                   {
-                    schedule.canceled == 1 ? <td class='redtext'>Cancelled!</td> :  
+                    schedule.canceled == 1 ? <td class='redtext'>Cancelled!</td> :
                     /*This button creates a cookie containing the data for the program the user is trying to enroll in, before sending the user to the enroll page*/
                     (document.cookie && schedule.current_enrollment<schedule.max_capacity) ? <td><button onClick={() => (document.cookie="program="+JSON.stringify(schedule)+"; path=/;", navigate("/Enroll")) }>Enroll</button></td> : <td></td>
                   }

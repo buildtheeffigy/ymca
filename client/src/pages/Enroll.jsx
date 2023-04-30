@@ -39,17 +39,21 @@ const DropClass = async (schedule_id, program_id, capac) =>{
   //This goes through the user's currently enrolled in programs, and returns any that conflict with the program they're currently enrolling in.
 const filtLoad = () =>{
   function dsf(value){
-    if(value.start_time>=JSON.parse(Cookies.get("program")).start_time && value.end_time<=JSON.parse(Cookies.get("program")).start_time && value.day_of_week==JSON.parse(Cookies.get("program")).day_of_week){//starts in the middle of another class
+    let dayss=JSON.parse(Cookies.get("program")).day_of_week.length-1;
+    while(dayss>=0){
+    if(value.start_time>=JSON.parse(Cookies.get("program")).start_time && value.end_time<=JSON.parse(Cookies.get("program")).start_time && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//starts in the middle of another class
       return value;
     }else{
-      if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.start_time<=JSON.parse(Cookies.get("program")).end_time && value.day_of_week==JSON.parse(Cookies.get("program")).day_of_week){//ends in the middle of another class
+      if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.start_time<=JSON.parse(Cookies.get("program")).end_time && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//ends in the middle of another class
         return value;
     }
     else{
-      if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.end_time>=JSON.parse(Cookies.get("program")).end_time && value.day_of_week==JSON.parse(Cookies.get("program")).day_of_week){//starts before class, and ends after class
+      if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.end_time>=JSON.parse(Cookies.get("program")).end_time && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//starts before class, and ends after class
         return value;
       }
     }
+  }
+  dayss-=1;
   }
 }
 const results = schedules.filter(dsf);
@@ -183,7 +187,13 @@ return(
           {state.list.map(schedule=>(
             <tr key={schedule.id}>
               <td>{schedule.name}</td>
-              <td>{schedule.day_of_week}</td>
+              <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+              {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+              {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+              {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+              {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+              {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+              {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>
               <td>{schedule.start_time}  {schedule.end_time}</td>
               <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
               {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
