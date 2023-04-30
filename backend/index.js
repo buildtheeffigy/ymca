@@ -299,6 +299,13 @@ app.post("/families", (req, res)=>{
          })
    })
 
+app.post("/deletefamilymember", (req, res)=>{
+    const query = "DELETE FROM families WHERE id = " + req.body.id;
+    db.query(query, (err, data)=>{
+        if(err) return res.json(err)
+        return res.json(data)
+         })
+})
 
 app.post("/login", (req, res)=>{
     const query = "SELECT * FROM users WHERE email = '" + req.body.email + "' AND deleted IS NULL";

@@ -66,14 +66,47 @@ const Users = () => {
 
     const handleHardDelete = async (id) =>{
       const res = await axios.post("http://localhost:8802/harddelete", {user_id: id});
-      window.location.href = '/HardDelete'
+      window.location.href = '/Users'
+    }
+
+    const handleHardDeleteFamily = async (id) =>{
+      //const res = await axios.post("http://localhost:8802/harddelete", {user_id: id});
+      //window.location.href = '/HardDelete'
+      const res = await axios.post("http://localhost:8802/deletefamilymember", {id: id});
+      window.location.href = '/Users'
     }
 
 
     useEffect(() => {
       const fetchAllUsers = async ()=>{
         try{
-            const res = await axios.get("http://localhost:8802/users");
+            let res = await axios.get("http://localhost:8802/users");
+            
+            for(let i = 0; i < res.data.length; i++){
+              if(res.data[i].family == 1){
+                console.log("family spooted: " + res.data[i].first_name);
+                const famresult = await axios.post("http://localhost:8802/families", {user_id: res.data[i].id});
+                console.log(famresult.data);
+                for(let xanopticon = 0; xanopticon < famresult.data.length; xanopticon++){
+                  //let rescopy = res.data[i];
+                  //rescopy.first_name = famresult.data[xanopticon].name;
+                  res.data.push({
+                    user_id: res.data[i].id, 
+                    username: res.data[i].username,
+                    first_name: famresult.data[xanopticon].name,
+                    last_name: res.data[i].last_name,
+                    private: res.data[i].private,
+                    current_enrollment: res.data[i].current_enrollment,
+                    membership_status: res.data[i].membership_status,
+                    email: res.data[i].email,
+                    family_id: famresult.data[xanopticon].id,
+                    family: 2
+                  });
+                  //res.data.push(rescopy);
+                  //console.log(rescopy);
+                }
+              }
+            }
             setUsers(res.data)
             setstate({
               query: document.getElementById('searchname').value,
@@ -188,7 +221,7 @@ const Users = () => {
                 <td>{user.private}</td>
                 <td>{user.family}</td>
                 <td>{user.email}</td>
-                <td><button id={user.id} onClick={() => (handleHardDelete(user.id))}>HARD DELETE</button></td>
+                <td>{user.family != 2 ? <button id={user.id} onClick={() => (handleHardDelete(user.id))}>HARD DELETE</button> : <button id={user.family_id} onClick={() => (handleHardDeleteFamily(user.family_id))}>HARD DELETE FAMILY MEMBER</button>}</td>
 
             </tr>
         ))}
