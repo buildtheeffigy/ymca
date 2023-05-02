@@ -20,6 +20,7 @@ import Enroll from "./pages/Enroll";
 import HardDelete from "./pages/HardDelete";
 import AdminProgram from "./pages/AdminProgram";
 import AdminHome from "./pages/AdminHome";
+import Help from "./pages/Help";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="/DeleteAccount" element={<DeleteAccount/>}/>
         <Route path="/HardDelete" element={<HardDelete/>}/>
         <Route path="/AdminHome" element={<AdminHome/>}/>
+        <Route path="/about" element={<Help/>}/>
         <Route path="/AdminProgram" element={<AdminProgram/>}/>
 
         </Routes>

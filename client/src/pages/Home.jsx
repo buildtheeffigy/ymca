@@ -75,13 +75,13 @@ const Home = () => {
         setUser(prev=>({...prev, ['private']: 0}))
       }
     }else{
-      setUser(prev=>({...prev, [e.target.name]: e.target.value}))
+      setUser(prev=>({...prev,[e.target.name]: e.target.value}))
     }
 
 }
 //Probably updates some variables related to program creation?
 const handleChange2 = (e) =>{
-    setProgram(prev=>({...prev, [e.target.name]: e.target.value}))
+    setProgram(prev=>({...prev, ['teacher_id']:(JSON.parse(Cookies.get('user_id')).id), [e.target.name]: e.target.value}))
   }
 
 //!! Login page functions{
@@ -336,6 +336,54 @@ useEffect(() => {
 }
 
 
+//This goes through the user's currently enrolled in programs, and returns any that conflict with the program they're currently enrolling in.
+const filtLoad = (dayssString) =>{
+  function dsf(value){
+    let dayss=dayssString.length-1;
+    if ((value.start_date>=document.getElementById("start").value && value.start_date<=document.getElementById("end").value)||
+    (value.start_date<=document.getElementById("start").value && value.end_date>=document.getElementById("start").value)||
+    (value.start_date==document.getElementById("start").value && value.end_date==document.getElementById("end").value)){
+
+        while(dayss>=0){
+        if(value.start_time>=document.getElementById("start_time").value && value.start_time<=document.getElementById("end_time").value
+        && dayssString.charAt(dayss)!='0' && value.day_of_week.includes(dayssString.charAt(dayss))){//starts in the middle of another class
+          return value;
+        }
+        else{
+          if(value.start_time<=document.getElementById("start_time").value && value.end_time>=document.getElementById("start_time").value
+          && dayssString.charAt(dayss)!='0' && value.day_of_week.includes(dayssString.charAt(dayss))){//ends in the middle of another class
+            return value;
+        }
+        else{
+          if(value.start_time==document.getElementById("start_time").value && value.end_time==document.getElementById("end_time").value
+          && dayssString.charAt(dayss)!='0' && value.day_of_week.includes(dayssString.charAt(dayss))){//Same time frame
+            return value;
+          }
+        }
+      }
+      dayss-=1;
+      }
+  }
+}
+const results = schedule.filter(dsf);
+if (results[0]!=null){
+  console.log(results[0])
+  return true;
+}
+const results2=programss.filter(dsf);
+if (results2[0]!=null){
+  console.log(results2[0])
+  return true;
+}
+return false;
+}
+
+
+
+
+
+
+
     //The function that officially creates new programs
     const handleClickNex = async e =>{
       e.preventDefault();
@@ -383,7 +431,7 @@ useEffect(() => {
           } else if(endDate < starDate){
             document.getElementById("redtext10").innerHTML = "End date is earlier than start date!";
           }
-
+          let day_time=0;//this is the 'encoded' days of the week.
           if(document.getElementById("Monday").checked == false &&
           document.getElementById("Tuesday").checked == false &&
           document.getElementById("Wednesday").checked == false &&
@@ -394,6 +442,33 @@ useEffect(() => {
           ){
             document.getElementById("redtextweek").innerHTML = "Must enter days!";
           }
+          else{
+            if(document.getElementById("Monday").checked == true){
+              day_time+=1000000;
+            }
+            if(document.getElementById("Tuesday").checked == true){
+              day_time+=200000;
+            }
+            if(document.getElementById("Wednesday").checked == true){
+              day_time+=30000;
+            }
+            if(document.getElementById("Thursday").checked == true){
+              day_time+=4000;
+            }
+            if(document.getElementById("Friday").checked == true){
+              day_time+=500;
+            }
+            if(document.getElementById("Saturday").checked == true){
+              day_time+=60;
+            }
+            if(document.getElementById("Sunday").checked == true){
+              day_time+=7;
+            }
+          }
+          console.log(day_time);
+          if(filtLoad(day_time.toString())){
+            document.getElementById("redtextfinal").innerHTML="You are already hosting/enrolled in a program in this time frame!";
+          }
 
           var numInvalids=0;//if any errors have been thrown, they will be caught here, and the function stopped
           for(let i=0; i<assd.length; i++){
@@ -403,29 +478,6 @@ useEffect(() => {
           }
            if(numInvalids==0){//Else, continue with program creation
              document.getElementById("success").innerHTML="Program successfully created! Check \"created programs\"!"
-
-             let day_time=0;//this is the 'encoded' days of the week.
-             if(document.getElementById("Monday").checked == true){
-               day_time+=1000000;
-             }
-             if(document.getElementById("Tuesday").checked == true){
-               day_time+=200000;
-             }
-             if(document.getElementById("Wednesday").checked == true){
-               day_time+=30000;
-             }
-             if(document.getElementById("Thursday").checked == true){
-               day_time+=4000;
-             }
-             if(document.getElementById("Friday").checked == true){
-               day_time+=500;
-             }
-             if(document.getElementById("Saturday").checked == true){
-               day_time+=60;
-             }
-             if(document.getElementById("Sunday").checked == true){
-               day_time+=7;
-             }
 
             if(document.getElementById("prerequisite").checked){//If program has prereq
               const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: document.getElementById("name").value });
@@ -439,10 +491,6 @@ useEffect(() => {
                     day_of_week: day_time.toString(),
                     start_date: document.getElementById("start").value,
                     end_date: document.getElementById("end").value}); // insert into schedules
-                    console.log(result);
-                    console.log(result2);
-
-
 
                   const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                   const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
@@ -463,8 +511,7 @@ useEffect(() => {
                       resest[i].checked=false;
                     }
                   }
-                //navigate("/");
-
+                navigate("/");
               }else{
                 alert("Prerequisite class does not exist!  (Name must match previous class name)");
               }
@@ -478,8 +525,6 @@ useEffect(() => {
                                       day_of_week: day_time.toString(),
                                       start_date: document.getElementById("start").value,
                                       end_date: document.getElementById("end").value}); // insert into schedules
-                                      console.log(result);
-                                      console.log(result2);
 
                const res2=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
                const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
@@ -501,8 +546,7 @@ useEffect(() => {
                    resest[i].checked=false;
                  }
                }
-              //navigate("/");
-              console.log("Reloaded1");
+              navigate("/");
             }
           }
       }catch(err){
@@ -635,6 +679,7 @@ useEffect(() => {
 
                         </div>
                       </div>
+                      <div id='redtextfinal' className='redtext'></div>
                       <button className='formButton' onClick={handleClickNex}>Submit</button>
                       <label id="success" style={{color:"blue"}}></label>
                     </div>

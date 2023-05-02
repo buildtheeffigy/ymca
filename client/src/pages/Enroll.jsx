@@ -9,10 +9,12 @@ const Enroll = () =>{
 
   //This is for the user's currently enrolled classes
   const [schedules, setSchedules] = useState([])
+  const [scheStaff, setScheStaff] = useState([])
   const [query, setQuery] = useState('');
   const [state, setstate] = useState({
     query: '',
-    list: schedules
+    list_cust: schedules,
+    list_staff: scheStaff
   });
 
 //Drops the specified class
@@ -31,8 +33,8 @@ const DropClass = async (schedule_id, program_id, capac) =>{
 
   //Drops all classes that conflict with the class the user is currently trying to enroll in.
   const dropConflicts = () =>{
-    for(let i=0; i<state.list.length; i++){
-      DropClass(state.list[i].schedule_id,state.list[i].program_id,parseInt(state.list[i].current_enrollment));
+    for(let i=0; i<state.list_cust.length; i++){
+      DropClass(state.list_cust[i].schedule_id,state.list_cust[i].program_id,parseInt(state.list_cust[i].current_enrollment));
     }
   }
 
@@ -40,25 +42,38 @@ const DropClass = async (schedule_id, program_id, capac) =>{
 const filtLoad = () =>{
   function dsf(value){
     let dayss=JSON.parse(Cookies.get("program")).day_of_week.length-1;
-    while(dayss>=0){
-    if(value.start_time>=JSON.parse(Cookies.get("program")).start_time && value.end_time<=JSON.parse(Cookies.get("program")).start_time && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//starts in the middle of another class
-      return value;
-    }else{
-      if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.start_time<=JSON.parse(Cookies.get("program")).end_time && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//ends in the middle of another class
-        return value;
-    }
-    else{
-      if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.end_time>=JSON.parse(Cookies.get("program")).end_time && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//starts before class, and ends after class
-        return value;
+    if ((value.start_date>=JSON.parse(Cookies.get("program")).start_date && value.start_date<=JSON.parse(Cookies.get("program")).end_date)||
+    (value.start_date<=JSON.parse(Cookies.get("program")).start_date && value.end_date>=JSON.parse(Cookies.get("program")).start_date)||
+    (value.start_date==JSON.parse(Cookies.get("program")).start_date && value.end_date==JSON.parse(Cookies.get("program")).end_date)){
+
+        while(dayss>=0){
+        if(value.start_time>=JSON.parse(Cookies.get("program")).start_time && value.start_time<=JSON.parse(Cookies.get("program")).end_time
+        && JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss)!='0'
+        && value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//starts in the middle of another class
+          return value;
+        }
+        else{
+          if(value.start_time<=JSON.parse(Cookies.get("program")).start_time && value.end_time>=JSON.parse(Cookies.get("program")).start_time
+          && JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss)!='0' &&
+          value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//ends in the middle of another class
+            return value;
+        }
+        else{
+          if(value.start_time==JSON.parse(Cookies.get("program")).start_time && value.end_time==JSON.parse(Cookies.get("program")).end_time
+          && JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss)!='0' &&
+          value.day_of_week.includes(JSON.parse(Cookies.get("program")).day_of_week.charAt(dayss))){//Same time frame
+            return value;
+          }
+        }
       }
-    }
-  }
-  dayss-=1;
+      dayss-=1;
+      }
   }
 }
 const results = schedules.filter(dsf);
-  console.log(results);
-  state.list=results;
+const results2=scheStaff.filter(dsf);
+  state.list_cust=results;
+  state.list_staff=results2;
 }
 
 //This is the function that actually enrolls the user in a class
@@ -73,7 +88,6 @@ async function handleClick(e, schedule_id){
 
         }else{
           const prereq_id = await axios.post("http://localhost:8802/prereq2", {prereq_name: prereqname.data[0].prereq_name});
-          console.log(prereq_id.data);
           var tookany = false;
           for(let i = 0; i < prereq_id.data.length; i++){
             const didtheytakeit = await axios.post("http://localhost:8802/prereq3", {prereq: prereq_id.data[i].id, user_id: JSON.parse(Cookies.get('user_id')).id});
@@ -101,7 +115,6 @@ async function handleClick(e, schedule_id){
 
         }else{
           const result = await axios.post("http://localhost:8802/enrollment2", {user_id: JSON.parse(Cookies.get('user_id')).id, course_id: e, schedule_id: schedule_id, family_member_id: Cookies.get('family_id')});
-          console.log(result);
         }
       }catch(err){
         console.log(err);
@@ -113,18 +126,24 @@ async function handleClick(e, schedule_id){
 useEffect(() => {
     const fetchAllSchedules = async ()=>{
       try{
+        if(JSON.parse(Cookies.get('user_id')).private == 1){
+          const resA=await axios.post("http://localhost:8802/staffschedule",{teach_id:(JSON.parse(Cookies.get('user_id')).id)});
+          setScheStaff(resA.data);
+        }
             if(JSON.parse(Cookies.get('user_id')).family != null){
                     //family
                     const res = await axios.post("http://localhost:8802/personalschedulefamily", {user_id: JSON.parse(Cookies.get('user_id')).id, family_member_id: JSON.parse(Cookies.get('family_id'))});
                     setSchedules(res.data)
-                     state.list = res.data
+                     state.list_cust = res.data
+                     state.list_staff=scheStaff;
                      console.log("familiy");
             }else{
                 //not a family
                 console.log("not a family");
                 const res = await axios.post("http://localhost:8802/personalschedule", {user_id: JSON.parse(Cookies.get('user_id')).id});
                 setSchedules(res.data)
-                state.list = res.data
+                state.list_cust = res.data
+                state.list_staff=scheStaff;
             }
 
       }catch(err){
@@ -170,8 +189,40 @@ return(
         </div>
   </header>
   <div class='container'>
+    {state.list_staff[0]!=null ? (<table class='table'>
+      <thead bgcolor='purple'>
 
-  {state.list[0]!=null ?  (<table class='table'>
+        <th>Name</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Start/End Date</th>
+        <th>Price</th>
+        <th>Capacity (current/max)</th>
+      </thead>
+
+        <tbody>
+        {state.list_staff.map(schedule=>(
+
+          <tr key={schedule.id}>
+            <td>{schedule.name}</td>
+            <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
+            {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}
+            {schedule.day_of_week.includes('3') ? <span>W </span>:<span></span>}
+            {schedule.day_of_week.includes('4') ? <span>Th </span>:<span></span>}
+            {schedule.day_of_week.includes('5') ? <span>F </span>:<span></span>}
+            {schedule.day_of_week.includes('6') ? <span>Sa </span>:<span></span>}
+            {schedule.day_of_week.includes('7') ? <span>Su </span>:<span></span>}</td>
+            <td>{schedule.start_time}  {schedule.end_time}</td>
+            <td>{schedule.start_date.toString().split('T')[0]}  {schedule.end_date.toString().split('T')[0]}</td>
+            {(document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2)) ? <td>${schedule.member_price}</td>:<td>${schedule.base_price}</td>}
+            <td>{schedule.current_enrollment}/{schedule.max_capacity}</td>
+          </tr>
+        ))}
+
+        </tbody>
+    </table>
+    ):
+      state.list_cust[0]!=null ?  (<table class='table'>
         <thead bgcolor='purple'>
 
           <th>Name</th>
@@ -184,7 +235,7 @@ return(
           </thead>
 
           <tbody>
-          {state.list.map(schedule=>(
+          {state.list_cust.map(schedule=>(
             <tr key={schedule.id}>
               <td>{schedule.name}</td>
               <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
@@ -205,7 +256,7 @@ return(
       </table>
     ):(<div><div><h3 style={{margin:"5px"}}>All good!</h3></div><div> <button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}} onClick={()=> handleClick(JSON.parse(Cookies.get("program")).id, JSON.parse(Cookies.get("program")).schedule_id)}>Confirm enrollment</button>
     <a href="/programs"><button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}}>Cancel enrollment</button></a></div></div>)}
-      {state.list[0]!=null ? (<div><button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}} onClick={()=> dropConflicts()}>Drop conflicts</button>
+      {state.list_cust[0]!=null ? ( <div> {state.list_staff[0]==null ? <button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}} onClick={()=> dropConflicts()}>Drop conflicts</button>:<span style={{color:"red"}}>You're hosting a class!</span>}
         <a href="/programs"><button class="btn btn-sm" style={{backgroundColor:"purple", color:"whitesmoke", margin:"3px"}}>Cancel enrollment</button></a></div>):<div></div>}
 
   </div>
