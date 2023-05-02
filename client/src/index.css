@@ -20,9 +20,7 @@ code {
   align-items: center;
 }
 
-.SearchFeild{
-  width: 13vw;
-}
+
 
 input{
   padding:10px;
@@ -30,8 +28,16 @@ input{
   border-radius: 10px;
 }
 
-input:not([type='checkbox']){
+input:not([type='checkbox']):not([class='SearchFeild']):not([class='SearchFeild2']){
   width:250px;
+}
+
+.SearchFeild{
+  width: 13vw;
+}
+
+.SearchFeild2{
+  width: 12vw;
 }
 
 .collap{
@@ -102,9 +108,10 @@ tr:nth-child(even) {
 }
 
 #weekboxes{
-  width: 50%;
+  width: 890px;
   display:flex;
   margin:auto;
+
 }
 
 .weekday{

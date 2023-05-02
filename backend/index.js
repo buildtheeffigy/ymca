@@ -250,7 +250,7 @@ app.post("/scheduletable", (req, res)=>{
 app.get("/registrations", (req, res)=>{
     //const query = "SELECT users.id, users.first_name as username, families.id as 'family_id', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.user_id = users.id ORDER BY families.id;";
 
-    const query = "SELECT users.id, families.id as 'family_id', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.id = enrollment.family_member_id ORDER BY users.id;";
+    const query = "SELECT users.id, families.id as 'family_id', programs.id as 'programID', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.id = enrollment.family_member_id ORDER BY users.id;";
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)

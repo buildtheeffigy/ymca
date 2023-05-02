@@ -33,6 +33,12 @@ const Registrations = () => {
               return post
             }
             return post.start_time >= document.getElementById('searchTime').value;
+            }).filter(post =>{
+              if(document.getElementById('searchID').value == "") return post
+              return post.id==document.getElementById('searchID').value;
+            }).filter(post =>{
+              if(document.getElementById('searchProgID').value == "") return post
+              return post.programID==document.getElementById('searchProgID').value;
             }).filter(post => {
           if(document.getElementById('week').value.toLowerCase() == 'day'){
             return post
@@ -102,8 +108,10 @@ const Registrations = () => {
       </div>
 
       <div style={{width:"80vw", marginLeft:"2vw", marginRight:"2vw"}}>
-      <table class='table'>
+      <table>
           <thead bgcolor='purple'>
+          <th>User ID</th>
+          <th>Program ID</th>
           <th>First Name</th>
           <th>Last Name</th>
           <th>Program</th>
@@ -112,23 +120,30 @@ const Registrations = () => {
           <th>Start Time/End Time</th>
           <th></th>
           </thead>
-          <tbody>
           <tr>
           <td>
+            <label for="searchID" style={{fontSize:"20px"}}>Search by</label>
+            <input class="SearchFeild2" type="number" id='searchID' name='name' placeholder='User ID' onChange={handleQuery}/>
+          </td>
+          <td>
+            <label for="searchProgID" style={{fontSize:"20px"}}>Search by</label>
+            <input class="SearchFeild2" type="number" id='searchProgID' name='name' placeholder='Prog ID' onChange={handleQuery}/>
+          </td>
+          <td>
             <label for="searchnameF" style={{fontSize:"20px"}}>Search by</label>
-            <input class="SearchFeild" type="search" id='searchnameF' name='Fname' placeholder='First Name' value={query} onChange={handleQuery}/>
+            <input class="SearchFeild2" type="search" id='searchnameF' name='Fname' placeholder='First Name' value={query} onChange={handleQuery}/>
           </td>
           <td>
             <label for="searchnameL" style={{fontSize:"20px"}}>Search by</label>
-            <input class="SearchFeild" type="search" id='searchnameL' name='Lname' placeholder='Last Name' onChange={handleQuery}/>
+            <input class="SearchFeild2" type="search" id='searchnameL' name='Lname' placeholder='Last Name' onChange={handleQuery}/>
           </td>
           <td>
             <label for="searchProg" style={{fontSize:"20px"}}>Search by</label>
-            <input class="SearchFeild" type="search" id='searchProg' name='Prog' placeholder='Program' onChange={handleQuery}/>
+            <input class="SearchFeild2" type="search" id='searchProg' name='Prog' placeholder='Program' onChange={handleQuery}/>
           </td>
           <td>
           <label for="week" style={{fontSize:"20px"}}>Search by</label>
-          <select name="week" id="week" onChange={handleQuery}>
+          <select name="week" style={{width:"160px"}}id="week" onChange={handleQuery}>
             <option value="day">Weekday</option>
             <option value="1">Monday</option>
             <option value="2">Tuesday</option>
@@ -139,13 +154,15 @@ const Registrations = () => {
             <option value="7">Sunday</option>
           </select>
           </td>
-          <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input class="SearchFeild" type="date" id="searchDate" name="StartDate" placeholder='Name' onChange={handleQuery}/></td>
-          <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
+          <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input class="SearchFeild2" type="date" id="searchDate" name="StartDate" placeholder='Name' onChange={handleQuery}/></td>
+          <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild2" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
           </tr>
 
 
           {state.list.map(programs=>(
               <tr key={programs.id}>
+              <td>{programs.id}</td>
+              <td>{programs.programID}</td>
                 {
                     programs.family_name == "" || programs.family_name == null ? <td>{programs.first_name}</td> : <td>{programs.family_name}</td>
                 }
@@ -165,7 +182,6 @@ const Registrations = () => {
               </tr>
           ))}
 
-          </tbody>
       </table>
       </div>
     </div>

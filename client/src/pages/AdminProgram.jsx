@@ -29,6 +29,9 @@ const AdminProgram=()=>{
         }
         return post.start_time >= document.getElementById('searchTime').value;
       }).filter(post =>{
+        if(document.getElementById('searchID').value == "") return post
+        return post.id==document.getElementById('searchID').value;
+      }).filter(post =>{
           return ((document.cookie && JSON.parse(Cookies.get('user_id')).private == 1) ? (post.teacher_id!=JSON.parse(Cookies.get('user_id')).id):(post));
         }).filter(post=>{
         if(document.getElementById('searchprice').value == ""){
@@ -37,6 +40,16 @@ const AdminProgram=()=>{
         return ((document.cookie && (JSON.parse(Cookies.get('user_id')).private == 1 || JSON.parse(Cookies.get('user_id')).member_status == 2))
           ? (post.member_price<=document.getElementById('searchprice').value): (post.base_price<=document.getElementById('searchprice').value));
       }).filter(post => {
+      if(document.getElementById('capacityC').checked== false){
+        return post
+      }
+      return post.current_enrollment<post.max_capacity
+    }).filter(post => {
+    if(document.getElementById('canceledC').checked== false){
+      return post
+    }
+    return post.canceled==0
+  }).filter(post => {
       if(document.getElementById('week').value.toLowerCase() == 'day'){
         return post
       }
@@ -101,10 +114,10 @@ const AdminProgram=()=>{
 
     </header>
     <div>
-    <div style={{width:"80vw", marginLeft:"10vw", marginRight:"10vw"}}>
+    <div style={{width:"90vw", marginLeft:"1vw", marginRight:"2vw"}}>
     <table class='table'>
         <thead bgcolor='purple'>
-
+          <th>ID</th>
           <th>Name</th>
           <th>Day</th>
           <th>Time</th>
@@ -112,11 +125,14 @@ const AdminProgram=()=>{
           <th>Base Price/Member price</th>
           <th>Capacity (current/max)</th>
           <th>Canceled</th>
-
         </thead>
 
         <tbody>
           <tr>
+          <td>
+            <label for="searchID" style={{fontSize:"20px"}}>Search by</label>
+            <input class="SearchFeild" type="number" id='searchID' name='name' placeholder='Name'onChange={handleQuery}/>
+          </td>
           <td>
             <label for="searchname" style={{fontSize:"20px"}}>Search by</label>
             <input class="SearchFeild" type="search" id='searchname' name='name' placeholder='Name' value={query} onChange={handleQuery}/>
@@ -137,13 +153,20 @@ const AdminProgram=()=>{
           <td><label for="searchTime" style={{fontSize:"20px"}}>Earliest start time</label> <input class="SearchFeild" type="time" id="searchTime" name="StartTime" placeholder='Name' onChange={handleQuery}/></td>
           <td><label for="searchDate" style={{fontSize:"20px"}}>Earliest start date</label><input class="SearchFeild" type="date" id="searchDate" name="StartDate" placeholder='Name' onChange={handleQuery}/></td>
           <td><label for="searchprice" style={{fontSize:"20px"}}>Search by</label><input class="SearchFeild" type="search" id='searchprice' name='costs' placeholder='Maximum price' onChange={handleQuery}/></td>
-          <td></td>
-          <td></td>
+          <td>
+          <label for="capacityC" style={{fontSize:"20px"}}>Exclude Filled Classes</label>
+          <input type="checkbox" name="staff" id='capacityC' onChange={handleQuery}/>
+          </td>
+          <td>
+          <label for="canceledC" style={{fontSize:"20px"}}>Exclude Canceled Classes</label>
+          <input type="checkbox" name="staff" id='canceledC' onChange={handleQuery}/>
+          </td>
           </tr>
 
           { state.list.length!=0 ? (
         state.list.map(schedule=>(
             <tr key={schedule.id}>
+                <td>{schedule.id}</td>
                 <td>{schedule.name}</td>
                 <td>{schedule.day_of_week.includes('1') ? <span>M </span>:<span></span>}
                 {schedule.day_of_week.includes('2') ? <span>Tu </span>:<span></span>}

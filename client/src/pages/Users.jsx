@@ -25,9 +25,22 @@ const Users = () => {
           if(document.getElementById('searchname1').value == "") return post
           return post.first_name.toLowerCase().includes(document.getElementById('searchname1').value.toLowerCase());
         }).filter(post =>{
+          if(document.getElementById('searchID').value == "") return post
+          return post.id==document.getElementById('searchID').value;
+        }).filter(post =>{
           if(document.getElementById('searchname2').value == "") return post
           return post.last_name.toLowerCase().includes(document.getElementById('searchname2').value.toLowerCase());
-        }). filter(post =>{
+        }).filter(post =>{
+          console.log(post.family);
+          if(document.getElementById('famSearch1').checked == true){
+            if(document.getElementById('famSearch').checked == true){
+              return post.family!='';
+            }else{
+              return post.family=='';
+            }
+          }
+          return post;
+        }).filter(post =>{
           if(document.getElementById('memSearch').checked == true){
             if(document.getElementById('memStatus').checked == true){
               return post.membership_status==2;
@@ -81,7 +94,7 @@ const Users = () => {
       const fetchAllUsers = async ()=>{
         try{
             let res = await axios.get("http://localhost:8802/users");
-            
+
             for(let i = 0; i < res.data.length; i++){
               if(res.data[i].family == 1){
                 console.log("family spooted: " + res.data[i].first_name);
@@ -91,7 +104,7 @@ const Users = () => {
                   //let rescopy = res.data[i];
                   //rescopy.first_name = famresult.data[xanopticon].name;
                   res.data.push({
-                    user_id: res.data[i].id, 
+                    user_id: res.data[i].id,
                     username: res.data[i].username,
                     first_name: famresult.data[xanopticon].name,
                     last_name: res.data[i].last_name,
@@ -134,7 +147,7 @@ const Users = () => {
                   <a href="/AdminProgram/">Programs</a>
                   </div>
                   <div class="col-sm">
-                  <a href="/EnrollmentSearch/">Enrollments</a>
+                  <a href="/Registrations/">Registrations</a>
                   </div>
                   <div class="col-sm">
                   <a href="/about/">About</a>
@@ -157,17 +170,18 @@ const Users = () => {
 
               </div>
         </div>
+
   </header>
   </div>
 
 
-  <div style={{width:"80vw", marginRight:"10vw"}}>
+  <div style={{width:"100vw", marginRight:"10vw"}}>
     <table>
         <thead bgcolor='purple'>
+        <th>ID</th>
         <th>Username</th>
         <th>First Name</th>
         <th>Last Name</th>
-        <th>Current Enrollment</th>
         <th>Membership Status</th>
         <th>Private</th>
         <th>Family</th>
@@ -175,6 +189,10 @@ const Users = () => {
         <th>DELETE</th>
         </thead>
         <tr>
+        <td>
+          <label for="searchID" style={{fontSize:"20px"}}>Search by</label>
+          <input class="SearchFeild" type="number" id='searchID' name='name' placeholder='ID' onChange={handleQuery}/>
+        </td>
         <td>
           <label for="searchname" style={{fontSize:"20px"}}>Search by</label>
           <input class="SearchFeild" type="search" id='searchname' name='name' placeholder='Username' value={query} onChange={handleQuery}/>
@@ -187,12 +205,15 @@ const Users = () => {
           <label for="searchname2" style={{fontSize:"20px"}}>Search by</label>
           <input class="SearchFeild" type="search" id='searchname2' name='name' placeholder='Last name' onChange={handleQuery}/>
         </td>
-        <td> ??? </td>
         <td>
+        <div>
           <label for="memSearch" style={{fontSize:"15px"}}>Search by member status:</label>
           <input type="checkbox" id="memSearch" onChange={handleQuery}/>
+          </div>
+          <div>
           <label for="memStatus" style={{fontSize:"15px"}}>Filter Non-members:</label>
           <input type="checkbox" id="memStatus" onChange={handleQuery}/>
+          </div>
         </td>
         <td>
         <label for="privSearch" style={{fontSize:"20px"}}>Search by:</label>
@@ -203,7 +224,12 @@ const Users = () => {
           <option value="admin">Admin</option>
         </select>
         </td>
-        <td>???</td>
+        <td>
+          <label for="famSearch1" style={{fontSize:"15px"}}>Seach by family:</label>
+          <input type="checkbox" id="famSearch1" onChange={handleQuery}/>
+          <label for="famSearch" style={{fontSize:"15px"}}>Filter non-family:</label>
+          <input type="checkbox" id="famSearch" onChange={handleQuery}/>
+        </td>
         <td>
           <label for="searchEmail" style={{fontSize:"20px"}}>Search by</label>
           <input class="SearchFeild" type="search" id='searchEmail' name='name' placeholder='Email' onChange={handleQuery}/>
@@ -213,10 +239,10 @@ const Users = () => {
         </tr>
         {state.list.map(user=>(
             <tr key={user.id}>
+                <td>{user.id}</td>
                 <td>{user.username}</td>
                 <td>{user.first_name}</td>
                 <td>{user.last_name}</td>
-                <td>{user.current_enrollment}</td>
                 <td>{user.membership_status}</td>
                 <td>{user.private}</td>
                 <td>{user.family}</td>

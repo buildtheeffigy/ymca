@@ -52,14 +52,11 @@ const Schedules = () => {
     }
     return post.canceled==0
   });
-
-
       setstate({
         query: document.getElementById('searchname').value,
         list: results
       });
     }
-
     //loads program data
     useEffect(() => {
       const fetchAllSchedules = async ()=>{
@@ -112,7 +109,7 @@ const Schedules = () => {
           </div>
       </header>
       </div>
-      <div style={{width:"80vw", marginLeft:"2vw", marginRight:"2vw"}}>
+      <div style={{width:"80vw", marginLeft:"8vw", marginRight:"10vw"}}>
       <table class='table'>
           <thead bgcolor='purple'>
 
