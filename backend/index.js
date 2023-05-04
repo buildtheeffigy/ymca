@@ -30,15 +30,6 @@ app.get("/users", (req, res)=>{
 })
 
 
-/*app.get("/programs", (req, res)=>{
-    const query = "SELECT programs.id, description, canceled, max_capacity, programs.current_enrollment, base_price, member_price, name, first_name, last_name, email FROM programs INNER JOIN users ON users.id = programs.teacher_id;"
-
-    db.query(query, (err, data)=>{
-        if(err) return res.json(err)
-        return res.json(data)
-    })
-})*/
-
 //Returns data on all programs, used for the program search pages
 app.get("/schedules", (req, res)=>{
     const query = "SELECT schedule.id as 'schedule_id', programs.id as 'id', teacher_id, name, day_of_week, canceled, start_time, start_date, end_time, end_date, base_price, member_price, max_capacity, current_enrollment FROM schedule INNER JOIN programs on program_id = programs.id;";
@@ -119,8 +110,6 @@ app.post('/droppersonalclassfamily', (req, res)=>{
 app.post('/prereq', (req, res)=>{
     const query = "SELECT prereq_name FROM programs WHERE id = '" + req.body.course_id +  "'";
 
-    //const values = [req.body.course_id];
-
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
@@ -130,8 +119,6 @@ app.post('/prereq', (req, res)=>{
 app.post('/prereq2', (req, res)=>{
     const query = "SELECT id FROM programs WHERE name = '" + req.body.prereq_name +  "' AND prereq_name IS NULL";
 
-    //const values = [req.body.course_id];
-
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
         return res.json(data)
@@ -140,8 +127,6 @@ app.post('/prereq2', (req, res)=>{
 
 app.post('/prereq3', (req, res)=>{
     const query = "SELECT * FROM enrollment WHERE course_id = '" + req.body.prereq + "' AND user_id = '" + req.body.user_id + "'";
-
-    //const values = [req.body.course_id];
 
     db.query(query, (err, data)=>{
         if(err) return res.json(err)
@@ -180,6 +165,7 @@ app.post('/increaseSeats', (req, res)=>{
         return res.json(data)
     })
 })
+
 
 app.post("/createprogram", (req, res)=>{
     const query = 'INSERT INTO programs (description, max_capacity, current_enrollment, base_price, member_price, teacher_id, name) VALUES (?)';
@@ -220,6 +206,7 @@ app.post("/createprogram2", (req, res)=>{
     })
 })
 
+//Cancels a program
 app.post('/cancelProgram', (req, res)=>{
       const query="UPDATE programs SET canceled=1 WHERE id="+req.body.program_id+"";
 
@@ -248,8 +235,6 @@ app.post("/scheduletable", (req, res)=>{
 })
 
 app.get("/registrations", (req, res)=>{
-    //const query = "SELECT users.id, users.first_name as username, families.id as 'family_id', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.user_id = users.id ORDER BY families.id;";
-
     const query = "SELECT users.id, families.id as 'family_id', programs.id as 'programID', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.id = enrollment.family_member_id ORDER BY users.id;";
 
     db.query(query, (err, data)=>{

@@ -2,10 +2,10 @@ import React from 'react'
 import {useNavigate} from "react-router-dom"
 import Cookies from 'js-cookie'
 import iiii from './YMCA-Logo-2010.png'
-//Deletes all cookies.
 const AdminHome =()=>{
 
   return( <div>
+    {/*The header bar*/}
     <header>
           <div class="container">
                 <div class="row">
@@ -36,10 +36,8 @@ const AdminHome =()=>{
                         document.cookie ? <a href="/Logout/">Logout</a> : <div></div>
                     }
                     </div>
-
                 </div>
           </div>
-
     </header>
 
     <h3>Welcome to the admin account</h3>
