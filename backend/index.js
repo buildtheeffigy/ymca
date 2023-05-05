@@ -107,6 +107,7 @@ app.post('/droppersonalclassfamily', (req, res)=>{
     })
 })
 
+//the following three functions are used one after the other in order to properly check if the user has taken prerequisite classes that are needed.
 app.post('/prereq', (req, res)=>{
     const query = "SELECT prereq_name FROM programs WHERE id = '" + req.body.course_id +  "'";
 
@@ -134,6 +135,7 @@ app.post('/prereq3', (req, res)=>{
     })
 })
 
+//used for normal accounts to enroll in a class
 app.post('/enrollment', (req, res)=>{
     const query = 'INSERT INTO enrollment (user_id, course_id, schedule_id) VALUES (?)';
 
@@ -145,6 +147,7 @@ app.post('/enrollment', (req, res)=>{
     })
 })
 
+//used specifically for family members to enroll
 app.post('/enrollment2', (req, res)=>{
     const query = 'INSERT INTO enrollment (user_id, course_id, schedule_id, family_member_id) VALUES (?)';
 
@@ -166,7 +169,7 @@ app.post('/increaseSeats', (req, res)=>{
     })
 })
 
-
+//create program without prerequisite
 app.post("/createprogram", (req, res)=>{
     const query = 'INSERT INTO programs (description, max_capacity, current_enrollment, base_price, member_price, teacher_id, name) VALUES (?)';
 
@@ -186,6 +189,7 @@ app.post("/createprogram", (req, res)=>{
     })
 })
 
+//create program that needs a prerequisite
 app.post("/createprogram2", (req, res)=>{
     const query = 'INSERT INTO programs (description, max_capacity, current_enrollment, base_price, member_price, teacher_id, name, prereq_name) VALUES (?)';
 
@@ -216,6 +220,7 @@ app.post('/cancelProgram', (req, res)=>{
     })
 })
 
+//creates new entry in the schedule table, used for creating multiple days for the same class
 app.post("/scheduletable", (req, res)=>{
     const query = 'INSERT INTO schedule (program_id, start_time, end_time, day_of_week, start_date, end_date) VALUES (?)';
 
@@ -234,6 +239,7 @@ app.post("/scheduletable", (req, res)=>{
     })
 })
 
+//Used for checking registration conflicts
 app.get("/registrations", (req, res)=>{
     const query = "SELECT users.id, families.id as 'family_id', programs.id as 'programID', families.name as 'family_name', programs.name, start_time, end_time, day_of_week, start_date, end_date, first_name, last_name FROM enrollment INNER JOIN programs on programs.id = course_id INNER JOIN users on users.id = enrollment.user_id INNER JOIN schedule on schedule.id = enrollment.schedule_id LEFT JOIN families on families.id = enrollment.family_member_id ORDER BY users.id;";
 
@@ -244,7 +250,7 @@ app.get("/registrations", (req, res)=>{
 })
 
 app.post("/search", (req, res)=>{
- //does this mf already exist
+ //does this user already exist
  const search = "SELECT * FROM users WHERE username = '" + req.body.username + "' OR email = '" + req.body.email + "'";
  const values = [req.body.email, req.body.username];
 
@@ -255,7 +261,7 @@ app.post("/search", (req, res)=>{
 })
 
 app.post("/upgradeToMember", (req, res)=>{
-    //does this mf already exist
+    //upgrades the normal account to a YMCA member account
     const query = "UPDATE users SET membership_status = 2 WHERE id = " + req.body.upgrade_id + "";
 
        db.query(query, (err, data)=>{
@@ -265,7 +271,7 @@ app.post("/upgradeToMember", (req, res)=>{
 })
 
 app.post("/upgradeToFamily", (req, res)=>{
-    //does this mf already exist
+    //upgrades a normal account to a family account
     const query = "UPDATE users SET family = 1 WHERE id = " + req.body.upgrade_id + "";
 
        db.query(query, (err, data)=>{
@@ -275,7 +281,7 @@ app.post("/upgradeToFamily", (req, res)=>{
 })
 
 app.post("/families", (req, res)=>{
-    //does this mf already exist
+    //gets all family members associated with a single family account id
     const query = "SELECT * FROM families WHERE user_id = " + req.body.user_id + "";
 
        db.query(query, (err, data)=>{
@@ -284,6 +290,7 @@ app.post("/families", (req, res)=>{
          })
    })
 
+   //lets administrators delete family members on family accounts
 app.post("/deletefamilymember", (req, res)=>{
     const query = "DELETE FROM families WHERE id = " + req.body.id;
     db.query(query, (err, data)=>{
@@ -292,6 +299,8 @@ app.post("/deletefamilymember", (req, res)=>{
          })
 })
 
+
+//function that we used to figure out if the login info has been used for a soft deleted account
 app.post("/login", (req, res)=>{
     const query = "SELECT * FROM users WHERE email = '" + req.body.email + "' AND deleted IS NULL";
     db.query(query, (err, data)=>{
@@ -300,6 +309,7 @@ app.post("/login", (req, res)=>{
     })
 })
 
+//adding a new family member
 app.post("/familymember", (req, res)=>{
     const q = "INSERT INTO families (user_id, name) VALUES (?)";
 
@@ -314,6 +324,7 @@ app.post("/familymember", (req, res)=>{
     })
 })
 
+//creates new user with proper hashed password
 app.post("/users", (req, res)=>{
     const q = "INSERT INTO users (first_name, last_name, current_enrollment, password, membership_status, private, username, family, email) VALUES (?)";
 
